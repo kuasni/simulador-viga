@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Viga de Concreto Reforzado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .p5Canvas {
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            display: block; /* Para evitar espacios extra */
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            cursor: pointer;
+            border-radius: 50%;
+            margin-top: -8px; /* Alineación vertical */
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 lg:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl lg:text-4xl font-bold text-blue-700">Simulador de Viga de Concreto Reforzado</h1>
+            <p class="mt-2 text-lg text-slate-600">Analiza la viga, su deformación, diagramas de cortante y momento.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Panel de Controles -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-fit">
+                <h2 class="text-2xl font-semibold mb-6 border-b pb-3 text-slate-800">Parámetros de Diseño</h2>
+
+                <!-- Propiedades Geométricas -->
+                <div class="space-y-6">
+                    <div>
+                        <label for="longitud" class="block font-medium text-slate-700">Longitud (L): <span id="longitud-val" class="font-bold text-blue-600"></span> m</label>
+                        <input type="range" id="longitud" min="3" max="12" value="6" step="0.1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="base" class="block font-medium text-slate-700">Base (b): <span id="base-val" class="font-bold text-blue-600"></span> cm</label>
+                        <input type="range" id="base" min="15" max="50" value="25" step="1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="altura" class="block font-medium text-slate-700">Altura (h): <span id="altura-val" class="font-bold text-blue-600"></span> cm</label>
+                        <input type="range" id="altura" min="20" max="80" value="40" step="1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Propiedades de Materiales -->
+                <h3 class="text-xl font-semibold mt-8 mb-4 border-b pb-2 text-slate-800">Materiales</h3>
+                <div class="space-y-6">
+                    <div>
+                        <label for="fc" class="block font-medium text-slate-700">Resistencia Concreto (f'c): <span id="fc-val" class="font-bold text-blue-600"></span> kg/cm²</label>
+                        <input type="range" id="fc" min="150" max="500" value="250" step="10" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="fy" class="block font-medium text-slate-700">Fluencia Acero (fy): <span id="fy-val" class="font-bold text-blue-600"></span> kg/cm²</label>
+                        <input type="range" id="fy" min="2800" max="5000" value="4200" step="100" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                     <div>
+                        <label for="recubrimiento" class="block font-medium text-slate-700">Recubrimiento (r): <span id="rec-val" class="font-bold text-blue-600"></span> cm</label>
+                        <input type="range" id="recubrimiento" min="2" max="7.5" value="4" step="0.5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+                
+                <!-- Acero de Refuerzo -->
+                <h3 class="text-xl font-semibold mt-8 mb-4 border-b pb-2 text-slate-800">Acero de Refuerzo (As)</h3>
+                <div class="space-y-2">
+                    <p class="text-sm text-slate-500">Define el área de acero con número y diámetro de barras.</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1">
+                            <label for="numBarras" class="block text-sm font-medium">Nº Barras</label>
+                            <input type="number" id="numBarras" value="3" min="1" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+                        </div>
+                        <div class="flex-1">
+                             <label for="diamBarras" class="block text-sm font-medium">Diámetro (#)</label>
+                             <select id="diamBarras" class="w-full p-2 border border-slate-300 rounded-md shadow-sm bg-white">
+                                 <option value="3">#3 (9.5mm)</option>
+                                 <option value="4">#4 (12.7mm)</option>
+                                 <option value="5">#5 (15.9mm)</option>
+                                 <option value="6" selected>#6 (19.1mm)</option>
+                                 <option value="8">#8 (25.4mm)</option>
+                             </select>
+                        </div>
+                    </div>
+                    <p class="text-center font-medium mt-2">Área de Acero (As): <span id="as-val" class="text-blue-600 font-bold"></span> cm²</p>
+                </div>
+
+                <!-- Controles de Simulación -->
+                <div class="mt-8 pt-4 border-t">
+                    <button id="start-sim" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg">Iniciar Simulación</button>
+                    <button id="reset-sim" class="w-full mt-3 bg-slate-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">Reiniciar</button>
+                </div>
+            </div>
+
+            <!-- Visualización Principal -->
+            <div class="lg:col-span-2 space-y-6">
+                <div id="canvas-container" class="bg-white rounded-lg shadow-lg p-2">
+                    <!-- El canvas de p5.js se insertará aquí -->
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800">Resultados en Tiempo Real</h2>
+                    <div id="status-message" class="p-4 mb-4 text-center font-bold text-xl rounded-lg">
+                        Presiona "Iniciar Simulación"
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                        <div class="bg-slate-100 p-4 rounded-lg">
+                            <h4 class="font-semibold text-slate-600">Carga Aplicada (w)</h4>
+                            <p id="carga-aplicada" class="text-2xl font-bold text-blue-600">0.00 kg/m</p>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-lg">
+                            <h4 class="font-semibold text-slate-600">Momento Actuante (Mu)</h4>
+                            <p id="momento-max" class="text-2xl font-bold text-blue-600">0.00 kg-m</p>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-lg">
+                            <h4 class="font-semibold text-slate-600">Momento Resistente (ΦMn)</h4>
+                            <p id="momento-res" class="text-2xl font-bold text-green-600">0.00 kg-m</p>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-lg">
+                            <h4 class="font-semibold text-slate-600">Tipo de Falla</h4>
+                            <p id="failure-type" class="text-xl font-bold">--</p>
+                        </div>
+                    </div>
+                    <!-- Contenedor para los diagramas inferiores -->
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div id="strain-profile-container-wrapper" class="bg-slate-100 p-2 rounded-lg">
+                           <p class="text-center font-semibold text-slate-700 text-sm mb-1">Diagrama de Deformación (ε)</p>
+                           <div id="strain-profile-container" style="height: 200px;"></div>
+                        </div>
+                        <div id="cross-section-container-wrapper" class="bg-slate-100 p-2 rounded-lg">
+                            <p class="text-center font-semibold text-slate-700 text-sm mb-1">Sección Transversal</p>
+                            <div id="cross-section-container" style="height: 200px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Objeto global para almacenar las instancias de p5
+        let p5_instances = {};
+        
+        // Constantes globales
+        const Es = 2000000; // Módulo de elasticidad del acero en kg/cm²
+        const epsilon_c_ult = 0.003; // Deformación última del concreto
+        const diametros_cm2 = { '3': 0.71, '4': 1.29, '5': 1.99, '6': 2.84, '8': 5.07 };
+        const diametros_mm = { '3': 9.5, '4': 12.7, '5': 15.9, '6': 19.1, '8': 25.4 };
+
+        // SKETCH PRINCIPAL: VIGA Y DIAGRAMAS DE FUERZAS
+        let mainSketch = function(p) {
+            let dom = {};
+            let sim = {
+                running: false, beamFailed: false, load: 0, phiMn: 0,
+                beam: { c: 0, epsilon_s: 0 },
+                loadIncrement: 0, failureLoad: 0, Vmax_at_failure: 0
+            };
+            
+            p.setup = function() {
+                let canvasContainer = p.select('#canvas-container');
+                p.createCanvas(canvasContainer.width, canvasContainer.width * 0.65).parent(canvasContainer);
+                p.pixelDensity(1);
+                p.sim = sim; // Adjuntar sim a la instancia para acceso global
+                connectDOM(); addEventListeners();
+                updateBeamProperties(); resetSimulation();
+            };
+
+            p.windowResized = function() {
+                let canvasContainer = p.select('#canvas-container');
+                p.resizeCanvas(canvasContainer.width, canvasContainer.width * 0.65);
+            };
+
+            function connectDOM() {
+                dom.longitudSlider = p.select('#longitud'); dom.baseSlider = p.select('#base'); dom.alturaSlider = p.select('#altura');
+                dom.fcSlider = p.select('#fc'); dom.fySlider = p.select('#fy'); dom.recubrimientoSlider = p.select('#recubrimiento');
+                dom.numBarrasInput = p.select('#numBarras'); dom.diamBarrasSelect = p.select('#diamBarras');
+                dom.longitudVal = p.select('#longitud-val'); dom.baseVal = p.select('#base-val'); dom.alturaVal = p.select('#altura-val');
+                dom.fcVal = p.select('#fc-val'); dom.fyVal = p.select('#fy-val'); dom.recVal = p.select('#rec-val');
+                dom.asVal = p.select('#as-val');
+                dom.startBtn = p.select('#start-sim'); dom.resetBtn = p.select('#reset-sim');
+                dom.failureTypeEl = p.select('#failure-type');
+            }
+
+            function addEventListeners() {
+                dom.startBtn.mousePressed(() => { 
+                    if (!sim.beamFailed && sim.phiMn > 0) {
+                        sim.failureLoad = (8 * sim.phiMn) / (sim.beam.L * sim.beam.L);
+                        sim.Vmax_at_failure = sim.failureLoad * sim.beam.L / 2;
+                        sim.loadIncrement = sim.failureLoad / (4 * 60);
+                        sim.running = true;
+                    }
+                });
+                dom.resetBtn.mousePressed(resetSimulation);
+                [dom.longitudSlider, dom.baseSlider, dom.alturaSlider, dom.fcSlider, dom.fySlider, dom.recubrimientoSlider, dom.numBarrasInput, dom.diamBarrasSelect].forEach(input => {
+                    input.input(updateBeamProperties);
+                });
+            }
+
+            function updateBeamProperties() {
+                sim.beam.L = dom.longitudSlider.value(); sim.beam.b = dom.baseSlider.value(); sim.beam.h = dom.alturaSlider.value();
+                sim.beam.fc = dom.fcSlider.value(); sim.beam.fy = dom.fySlider.value(); sim.beam.rec = dom.recubrimientoSlider.value();
+                sim.beam.numBarras = dom.numBarrasInput.value(); sim.beam.diamKey = dom.diamBarrasSelect.value();
+                sim.beam.As = sim.beam.numBarras * diametros_cm2[sim.beam.diamKey];
+                dom.longitudVal.html(parseFloat(sim.beam.L).toFixed(1)); dom.baseVal.html(parseFloat(sim.beam.b).toFixed(0));
+                dom.alturaVal.html(parseFloat(sim.beam.h).toFixed(0)); dom.fcVal.html(parseFloat(sim.beam.fc).toFixed(0));
+                dom.fyVal.html(parseFloat(sim.beam.fy).toFixed(0)); dom.recVal.html(parseFloat(sim.beam.rec).toFixed(1));
+                dom.asVal.html(parseFloat(sim.beam.As).toFixed(2));
+                calculateResistantMoment(); resetSimulation();
+            }
+
+            function calculateResistantMoment() {
+                const d = sim.beam.h - sim.beam.rec; if (d <= 0) { sim.phiMn = 0; return; }
+                const analysisResult = findNeutralAxis(sim.beam);
+                const c = analysisResult.c; const fs = analysisResult.fs;
+                sim.beam.c = c;
+                const epsilon_s = epsilon_c_ult * (d - c) / c; sim.beam.epsilon_s = epsilon_s;
+                const epsilon_y = sim.beam.fy / Es; let phi;
+                if (epsilon_s >= 0.005) phi = 0.90;
+                else if (epsilon_s <= epsilon_y) phi = 0.65;
+                else phi = 0.65 + 0.25 * (epsilon_s - epsilon_y) / (0.005 - epsilon_y);
+                const beta1 = p.max(0.65, 0.85 - 0.05 * p.max(0, sim.beam.fc - 280) / 70);
+                const a = beta1 * c; const Mn = sim.beam.As * fs * (d - a / 2);
+                sim.phiMn = phi * Mn / 100;
+                updateFailureType(epsilon_s, epsilon_y);
+                p.select('#momento-res').html(`${sim.phiMn.toLocaleString('es-MX', {maximumFractionDigits: 0})} kg-m`);
+            }
+
+            function updateFailureType(epsilon_s, epsilon_y) {
+                let msg, color;
+                if (epsilon_s >= 0.005) { msg = "Dúctil (Tensión)"; color = "text-green-600"; } 
+                else if (epsilon_s <= epsilon_y) { msg = "Frágil (Compresión)"; color = "text-red-600"; }
+                else { msg = "En Transición"; color = "text-orange-500"; }
+                dom.failureTypeEl.html(msg).class(`text-xl font-bold ${color}`);
+            }
+            
+            function findNeutralAxis(beam) {
+                const d = beam.h - beam.rec; let c_low = 0.001, c_high = beam.h, c = d/2;
+                const beta1 = p.max(0.65, 0.85 - 0.05 * p.max(0, beam.fc - 280) / 70);
+                for (let i = 0; i < 100; i++) {
+                    c = (c_low + c_high) / 2; if (c <= 0) c = 0.001;
+                    const T = beam.As * Math.min(beam.fy, Es * epsilon_c_ult * (d - c) / c);
+                    const C = 0.85 * beam.fc * (beta1 * c) * beam.b;
+                    if (Math.abs(T - C) < 1.0) break;
+                    if (C > T) c_high = c; else c_low = c;
+                }
+                return { c: c, fs: Math.min(beam.fy, Es * epsilon_c_ult * (d - c) / c) };
+            }
+
+            function resetSimulation() {
+                sim.running = false; sim.beamFailed = false; sim.load = 0; sim.loadIncrement = 0;
+                updateStatus('Presiona "Iniciar Simulación"', 'bg-blue-100', 'text-blue-800');
+                if (p5_instances.strainProfile) p5_instances.strainProfile.update(0);
+                if (p5_instances.crossSection) p5_instances.crossSection.update();
+                p.loop();
+            }
+
+            function updateStatus(message, bgColor, textColor) { p.select('#status-message').html(message).class(`p-4 mb-4 text-center font-bold text-xl rounded-lg ${bgColor} ${textColor}`); }
+
+            p.draw = function() {
+                p.background(248, 250, 252);
+                if (sim.running && !sim.beamFailed) { sim.load += sim.loadIncrement; updateStatus('Simulación en curso...', 'bg-yellow-100', 'text-yellow-800'); }
+                let Mu = (sim.load * sim.beam.L * sim.beam.L) / 8;
+                if (Mu >= sim.phiMn && !sim.beamFailed && sim.phiMn > 0) {
+                    sim.beamFailed = true; sim.running = false; Mu = sim.phiMn; sim.load = sim.failureLoad;
+                    updateStatus(`¡FALLA ESTRUCTURAL!`, 'bg-red-200', 'text-red-800'); p.noLoop();
+                }
+                p.select('#carga-aplicada').html(`${sim.load.toFixed(2)} kg/m`);
+                p.select('#momento-max').html(`${Mu.toLocaleString('es-MX', {maximumFractionDigits: 0})} kg-m`);
+                let progress = sim.phiMn > 0 ? Mu / sim.phiMn : 0;
+                if (p5_instances.strainProfile) p5_instances.strainProfile.update(progress);
+                if (p5_instances.crossSection) p5_instances.crossSection.update();
+                drawBeamAndForces(Mu);
+            };
+
+            function drawBeamAndForces(Mu) {
+                const marginX = p.width * 0.12; const beamY = p.height * 0.35;
+                const beamLen = p.width - 2 * marginX; const { L, h, fc, b } = sim.beam;
+                p.push(); p.translate(marginX, beamY);
+                p.fill(120); p.noStroke(); p.triangle(0, 0, -15, 20, 15, 20);
+                p.triangle(beamLen, 0, beamLen - 15, 20, beamLen + 15, 20); p.ellipse(beamLen, 25, 30, 10);
+                if (sim.load > 0) {
+                    p.fill(255, 165, 0, 150);
+                    const maxLoadForScale = sim.failureLoad > 0 ? sim.failureLoad * 1.1 : 10000;
+                    const loadHeight = p.map(sim.load, 0, maxLoadForScale, 0, 40);
+                    for (let x = 0; x <= beamLen; x += 12) arrow(x, -loadHeight - h/4 - 5, 0, loadHeight);
+                }
+                if (sim.load > 0 && sim.phiMn > 0) {
+                    const L_cm = L * 100;
+                    const flecha_max_cm = (5 * (sim.load / 100) * L_cm**4) / (384 * (15000 * p.sqrt(fc)) * (b * h**3 / 12));
+                    const flecha_visible = flecha_max_cm * ((p.height * 0.25) / (L_cm / 240));
+                    p.noFill(); p.stroke(sim.beamFailed ? '#ef4444' : '#3b82f6'); p.strokeWeight(h/2);
+                    p.beginShape(); p.curveVertex(0, 0); p.curveVertex(0, 0);
+                    for (let x = 0; x <= beamLen; x += 10) p.curveVertex(x, 4 * flecha_visible * (x / beamLen - (x/beamLen)**2));
+                    p.curveVertex(beamLen, 0); p.curveVertex(beamLen, 0); p.endShape();
+                    const failY = 4 * flecha_visible * 0.25;
+                    p.stroke(0, 100); p.strokeWeight(1); p.drawingContext.setLineDash([5, 5]);
+                    p.line(beamLen/2, 0, beamLen/2, failY); p.drawingContext.setLineDash([]);
+                    p.fill(0); p.noStroke(); p.textAlign(p.CENTER, p.BOTTOM);
+                    p.text(`Flecha: ${flecha_max_cm.toFixed(2)} cm`, beamLen/2, failY - 5);
+                    if (sim.beamFailed) {
+                        p.fill(255, 0, 0); p.noStroke(); p.ellipse(beamLen / 2, failY, 20, 20);
+                        p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.text('!', beamLen / 2, failY);
+                    }
+                }
+                p.noFill(); p.stroke(50); p.strokeWeight(2); p.rect(0, -h/4, beamLen, h/2);
+                p.stroke(100); p.strokeWeight(1); p.line(-10, 40, beamLen+10, 40);
+                p.line(0, 35, 0, 45); p.line(beamLen, 35, beamLen, 45);
+                p.fill(50); p.noStroke(); p.textAlign(p.CENTER, p.TOP);
+                p.text(`L = ${L} m`, beamLen/2, 50);
+                p.pop();
+                drawDiagrams(Mu, marginX, beamLen);
+            }
+
+            function drawDiagrams(Mu, marginX, beamLen) {
+                const diagramY_V = p.height * 0.70; const diagramY_M = p.height * 0.90; const diagramH = p.height * 0.12;
+                const Vmax = (sim.load * sim.beam.L) / 2;
+                const escalaV = sim.Vmax_at_failure > 0 ? diagramH / sim.Vmax_at_failure : 0;
+                const escalaM = sim.phiMn > 0 ? diagramH / (sim.phiMn * 1.1) : 0;
+                drawSingleDiagram('Cortante (V)', marginX, diagramY_V, beamLen, (x_norm) => (0.5 - x_norm) * 2 * Vmax * escalaV, Vmax);
+                drawSingleDiagram('Momento (M)', marginX, diagramY_M, beamLen, (x_norm) => 4 * Mu * (x_norm - x_norm**2) * escalaM, Mu, true);
+            }
+
+            function drawSingleDiagram(title, x, y, w, func, val, isMoment = false) {
+                p.push(); p.translate(x, y);
+                p.stroke(150); p.strokeWeight(1.5); p.line(0, -40, 0, 40);
+                p.noStroke(); p.fill(37, 99, 235, 100);
+                p.beginShape(); p.vertex(0, 0);
+                for (let i = 0; i <= w; i++) p.vertex(i, -func(i / w));
+                p.vertex(w, 0); p.endShape(p.CLOSE);
+                p.stroke(150); p.strokeWeight(1.5); p.line(0,0,w,0);
+                p.noStroke(); p.fill(50); p.textAlign(p.RIGHT, p.CENTER);
+                p.text(title, -15, 0);
+                if (isMoment) {
+                    p.textAlign(p.CENTER, p.BOTTOM);
+                    p.text(val.toFixed(0) + ' kg-m', w/2, -Math.abs(func(0.5)) - 5);
+                } else {
+                    p.textAlign(p.LEFT, p.CENTER);
+                    p.text('+' + val.toFixed(0) + ' kg', 5, -Math.abs(func(0)) + 15);
+                    p.textAlign(p.RIGHT, p.CENTER);
+                    p.text(-val.toFixed(0) + ' kg', w - 5, Math.abs(func(1)) - 15);
+                }
+                p.pop();
+            }
+
+            function arrow(x, y, angle, len) {
+                p.push(); p.translate(x, y); p.rotate(angle);
+                p.line(0, 0, 0, len); p.triangle(0, len, -3, len - 3, 3, len - 3);
+                p.pop();
+            }
+        };
+
+        // SKETCH PARA PERFIL DE DEFORMACIÓN
+        let strainProfileSketch = function(p) {
+            let progress = 0, beamParams = {};
+            p.setup = function() {
+                const containerEl = document.getElementById('strain-profile-container');
+                p.createCanvas(containerEl.offsetWidth, containerEl.offsetHeight).parent(containerEl);
+                p.noLoop();
+            };
+            p.windowResized = function() { p.resizeCanvas(p.select('#strain-profile-container').width, p.select('#strain-profile-container').height); };
+            p.update = function(newProgress) {
+                progress = p.constrain(newProgress, 0, 1);
+                if (p5_instances.main && p5_instances.main.sim) beamParams = p5_instances.main.sim.beam;
+                p.redraw();
+            };
+            p.draw = function() {
+                p.background(241, 245, 249);
+                if (!beamParams || !beamParams.h) return;
+                const { h, c, epsilon_s, rec } = beamParams;
+                if (c <= 0) return;
+                const current_epsilon_c = progress * epsilon_c_ult;
+                const current_epsilon_s = progress * epsilon_s;
+                p.push();
+                p.translate(p.width / 2, p.height / 2); p.scale(p.height / h * 0.7);
+                p.translate(0, -h/2);
+                p.stroke(200); p.line(0, 0, 0, h);
+                const max_abs_strain = Math.max(epsilon_c_ult, epsilon_s);
+                const scaleX = (p.width / 2.5) / max_abs_strain / (p.height / h * 0.7) ;
+                p.stroke(239, 68, 68); p.strokeWeight(2); p.fill(239, 68, 68, 50);
+                p.triangle(0, c, current_epsilon_c * scaleX, 0, 0, 0);
+                p.triangle(0, c, -current_epsilon_s * scaleX, h - rec, 0, h - rec);
+                p.stroke(37, 99, 235, 150); p.strokeWeight(1.5); p.line(-p.width, c, p.width, c);
+                
+                p.noStroke(); p.fill(50);
+                const unscale = 1/(p.height / h * 0.7);
+                p.textSize(12 * unscale);
+                
+                p.textAlign(p.RIGHT, p.BOTTOM);
+                p.text(`εc=${current_epsilon_c.toFixed(5)}`, -5, 0);
+
+                p.textAlign(p.LEFT, p.TOP);
+                p.text(`εs=${current_epsilon_s.toFixed(5)}`, 5, h - rec);
+                p.pop();
+            };
+        };
+        
+        // SKETCH PARA SECCIÓN TRANSVERSAL
+        let crossSectionSketch = function(p) {
+            let beamParams = {};
+            p.setup = function() {
+                const containerEl = document.getElementById('cross-section-container');
+                p.createCanvas(containerEl.offsetWidth, containerEl.offsetHeight).parent(containerEl);
+                p.noLoop();
+            };
+            p.windowResized = function() { p.resizeCanvas(p.select('#cross-section-container').width, p.select('#cross-section-container').height); };
+            p.update = function() {
+                if (p5_instances.main && p5_instances.main.sim) beamParams = p5_instances.main.sim.beam;
+                p.redraw();
+            };
+            p.draw = function() {
+                p.background(241, 245, 249);
+                if (!beamParams || !beamParams.h) return;
+                const { h, b, rec, numBarras, diamKey } = beamParams;
+                const d = h - rec;
+                p.push();
+                p.translate(p.width/2, p.height/2);
+                const scaleFactor = p.min(p.width / (b * 1.6), p.height / (h * 1.6));
+                p.scale(scaleFactor); p.translate(-b/2, -h/2);
+                p.stroke(100); p.fill(200); p.rect(0,0,b,h);
+                const barDiameter = diametros_mm[diamKey] / 10;
+                const spacing = numBarras > 1 ? (b - 2 * rec - barDiameter) / (numBarras - 1) : 0;
+                p.fill(80); p.noStroke();
+                for (let i = 0; i < numBarras; i++) {
+                    let x_pos = numBarras > 1 ? rec + barDiameter / 2 + i * spacing : b / 2;
+                    p.ellipse(x_pos, d, barDiameter, barDiameter);
+                }
+                const textSize = 16 / scaleFactor;
+                p.textSize(textSize);
+                p.stroke(0); p.fill(0); p.textAlign(p.CENTER, p.BOTTOM);
+                p.line(0, -textSize*0.4, b, -textSize*0.4); p.text(`b=${b}cm`, b/2, -textSize*0.6);
+                p.textAlign(p.LEFT, p.CENTER);
+                p.line(b+textSize*0.4, 0, b+textSize*0.4, h); p.text(`h=${h}cm`, b+textSize*0.6, h/2);
+                p.textAlign(p.RIGHT, p.CENTER);
+                p.line(-textSize*0.4, 0, -textSize*0.4, d); p.text(`d=${d.toFixed(1)}cm`, -textSize*0.6, d/2);
+                p.pop();
+            };
+        };
+
+        function startSketchesWhenReady() {
+            const mainC = document.getElementById('canvas-container');
+            const strainC = document.getElementById('strain-profile-container');
+            const crossC = document.getElementById('cross-section-container');
+            if (mainC && strainC && crossC && mainC.offsetWidth > 0 && strainC.offsetWidth > 0) {
+                p5_instances.main = new p5(mainSketch);
+                p5_instances.strainProfile = new p5(strainProfileSketch);
+                p5_instances.crossSection = new p5(crossSectionSketch);
+            } else {
+                setTimeout(startSketchesWhenReady, 50);
+            }
+        }
+        window.onload = startSketchesWhenReady;
+
+    </script>
+
+</body>
+</html>
