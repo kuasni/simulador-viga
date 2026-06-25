@@ -3,191 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Viga de Concreto Reforzado</title>
+    <title>Strukturarte - Simulador de Viga</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #0b0f19; /* Fondo oscuro estilo Cyberpunk / Neón */
         }
         .p5Canvas {
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            display: block; /* Para evitar espacios extra */
+            border-radius: 0.75rem;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+            display: block;
+            margin: 0 auto;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #2563eb;
+            width: 24px;
+            height: 24px;
+            background: #00FFFF;
             cursor: pointer;
             border-radius: 50%;
-            margin-top: -8px; /* Alineación vertical */
-        }
-        input[type=range]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #2563eb;
-            cursor: pointer;
-            border-radius: 50%;
+            box-shadow: 0 0 10px #00FFFF;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="text-slate-100 flex justify-center items-center min-h-screen p-0 m-0">
 
-    <div class="container mx-auto p-4 lg:p-8">
+    <div class="w-[432px] h-[768px] bg-slate-950 p-4 flex flex-col justify-between relative overflow-hidden border border-slate-800 shadow-2xl">
         
-        <header class="text-center mb-8">
-            <h1 class="text-3xl lg:text-4xl font-bold text-blue-700">Simulador de Viga de Concreto Reforzado</h1>
-            <p class="mt-2 text-lg text-slate-600">Analiza la viga, su deformación, diagramas de cortante y momento.</p>
+        <header class="text-center pt-2">
+            <h1 class="text-xl font-bold text-cyan-400 tracking-wide uppercase">Strukturarte</h1>
+            <p class="text-xs text-slate-400">Flexión en Concreto Reforzado</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Panel de Controles -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-fit">
-                <h2 class="text-2xl font-semibold mb-6 border-b pb-3 text-slate-800">Parámetros de Diseño</h2>
+        <div id="status-message" class="py-2 text-center font-bold text-base rounded-md mx-2 transition-all">
+            Presiona Iniciar
+        </div>
 
-                <!-- Propiedades Geométricas -->
-                <div class="space-y-6">
-                    <div>
-                        <label for="longitud" class="block font-medium text-slate-700">Longitud (L): <span id="longitud-val" class="font-bold text-blue-600"></span> m</label>
-                        <input type="range" id="longitud" min="3" max="12" value="6" step="0.1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <label for="base" class="block font-medium text-slate-700">Base (b): <span id="base-val" class="font-bold text-blue-600"></span> cm</label>
-                        <input type="range" id="base" min="15" max="50" value="25" step="1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <label for="altura" class="block font-medium text-slate-700">Altura (h): <span id="altura-val" class="font-bold text-blue-600"></span> cm</label>
-                        <input type="range" id="altura" min="20" max="80" value="40" step="1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                </div>
-
-                <!-- Propiedades de Materiales -->
-                <h3 class="text-xl font-semibold mt-8 mb-4 border-b pb-2 text-slate-800">Materiales</h3>
-                <div class="space-y-6">
-                    <div>
-                        <label for="fc" class="block font-medium text-slate-700">Resistencia Concreto (f'c): <span id="fc-val" class="font-bold text-blue-600"></span> kg/cm²</label>
-                        <input type="range" id="fc" min="150" max="500" value="250" step="10" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <label for="fy" class="block font-medium text-slate-700">Fluencia Acero (fy): <span id="fy-val" class="font-bold text-blue-600"></span> kg/cm²</label>
-                        <input type="range" id="fy" min="2800" max="5000" value="4200" step="100" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                     <div>
-                        <label for="recubrimiento" class="block font-medium text-slate-700">Recubrimiento (r): <span id="rec-val" class="font-bold text-blue-600"></span> cm</label>
-                        <input type="range" id="recubrimiento" min="2" max="7.5" value="4" step="0.5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                </div>
-                
-                <!-- Acero de Refuerzo -->
-                <h3 class="text-xl font-semibold mt-8 mb-4 border-b pb-2 text-slate-800">Acero de Refuerzo (As)</h3>
-                <div class="space-y-2">
-                    <p class="text-sm text-slate-500">Define el área de acero con número y diámetro de barras.</p>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex-1">
-                            <label for="numBarras" class="block text-sm font-medium">Nº Barras</label>
-                            <input type="number" id="numBarras" value="3" min="1" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
-                        </div>
-                        <div class="flex-1">
-                             <label for="diamBarras" class="block text-sm font-medium">Diámetro (#)</label>
-                             <select id="diamBarras" class="w-full p-2 border border-slate-300 rounded-md shadow-sm bg-white">
-                                 <option value="3">#3 (9.5mm)</option>
-                                 <option value="4">#4 (12.7mm)</option>
-                                 <option value="5">#5 (15.9mm)</option>
-                                 <option value="6" selected>#6 (19.1mm)</option>
-                                 <option value="8">#8 (25.4mm)</option>
-                             </select>
-                        </div>
-                    </div>
-                    <p class="text-center font-medium mt-2">Área de Acero (As): <span id="as-val" class="text-blue-600 font-bold"></span> cm²</p>
-                </div>
-
-                <!-- Controles de Simulación -->
-                <div class="mt-8 pt-4 border-t">
-                    <button id="start-sim" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg">Iniciar Simulación</button>
-                    <button id="reset-sim" class="w-full mt-3 bg-slate-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">Reiniciar</button>
-                </div>
+        <div class="grid grid-cols-2 gap-2 px-2 text-center">
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                <h4 class="text-[10px] uppercase tracking-wider text-slate-400">Mu Actuante</h4>
+                <p id="momento-max" class="text-base font-bold text-cyan-400">0 kg-m</p>
             </div>
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                <h4 class="text-[10px] uppercase tracking-wider text-slate-400">ΦMn Resistente</h4>
+                <p id="momento-res" class="text-base font-bold text-emerald-400">0 kg-m</p>
+            </div>
+        </div>
 
-            <!-- Visualización Principal -->
-            <div class="lg:col-span-2 space-y-6">
-                <div id="canvas-container" class="bg-white rounded-lg shadow-lg p-2">
-                    <!-- El canvas de p5.js se insertará aquí -->
+        <div class="flex-1 flex flex-col justify-center space-y-2 my-2">
+            <div id="canvas-container" class="w-full p-1">
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800">Resultados en Tiempo Real</h2>
-                    <div id="status-message" class="p-4 mb-4 text-center font-bold text-xl rounded-lg">
-                        Presiona "Iniciar Simulación"
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-                        <div class="bg-slate-100 p-4 rounded-lg">
-                            <h4 class="font-semibold text-slate-600">Carga Aplicada (w)</h4>
-                            <p id="carga-aplicada" class="text-2xl font-bold text-blue-600">0.00 kg/m</p>
-                        </div>
-                        <div class="bg-slate-100 p-4 rounded-lg">
-                            <h4 class="font-semibold text-slate-600">Momento Actuante (Mu)</h4>
-                            <p id="momento-max" class="text-2xl font-bold text-blue-600">0.00 kg-m</p>
-                        </div>
-                        <div class="bg-slate-100 p-4 rounded-lg">
-                            <h4 class="font-semibold text-slate-600">Momento Resistente (ΦMn)</h4>
-                            <p id="momento-res" class="text-2xl font-bold text-green-600">0.00 kg-m</p>
-                        </div>
-                        <div class="bg-slate-100 p-4 rounded-lg">
-                            <h4 class="font-semibold text-slate-600">Tipo de Falla</h4>
-                            <p id="failure-type" class="text-xl font-bold">--</p>
-                        </div>
-                    </div>
-                    <!-- Contenedor para los diagramas inferiores -->
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                        <div id="strain-profile-container-wrapper" class="bg-slate-100 p-2 rounded-lg">
-                           <p class="text-center font-semibold text-slate-700 text-sm mb-1">Diagrama de Deformación (ε)</p>
-                           <div id="strain-profile-container" style="height: 200px;"></div>
-                        </div>
-                        <div id="cross-section-container-wrapper" class="bg-slate-100 p-2 rounded-lg">
-                            <p class="text-center font-semibold text-slate-700 text-sm mb-1">Sección Transversal</p>
-                            <div id="cross-section-container" style="height: 200px;"></div>
-                        </div>
-                    </div>
+            
+            <div class="grid grid-cols-2 gap-2 px-1">
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800 text-center">
+                    <p class="text-[10px] font-semibold text-slate-400 mb-1">Perfil ε</p>
+                    <div id="strain-profile-container" class="h-[90px] w-full"></div>
+                </div>
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800 text-center">
+                    <p class="text-[10px] font-semibold text-slate-400 mb-1">Sección Transversal</p>
+                    <div id="cross-section-container" class="h-[90px] w-full"></div>
                 </div>
             </div>
         </div>
+
+        <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2 mb-2">
+            <div class="flex justify-between items-center text-xs border-b border-slate-800 pb-1">
+                <span class="text-slate-400">Tipo de Falla: <strong id="failure-type" class="text-white">--</strong></span>
+                <span class="text-slate-400">As: <strong id="as-val" class="text-cyan-400">0</strong> cm²</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
+                <div>
+                    <label class="block text-slate-400">Longitud: <span id="longitud-val" class="text-white font-bold"></span>m</label>
+                    <input type="range" id="longitud" min="3" max="10" value="5" step="0.5" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-slate-400">Altura (h): <span id="altura-val" class="text-white font-bold"></span>cm</label>
+                    <input type="range" id="altura" min="30" max="70" value="50" step="5" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-slate-400">Base (b): <span id="base-val" class="text-white font-bold"></span>cm</label>
+                    <input type="range" id="base" min="15" max="40" value="25" step="5" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-slate-400">f'c: <span id="fc-val" class="text-white font-bold"></span> kg/v²</label>
+                    <input type="range" id="fc" min="200" max="450" value="250" step="50" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 pt-1 text-[11px]">
+                <div class="flex-1 flex items-center space-x-1">
+                    <span class="text-slate-400">Varillas:</span>
+                    <input type="number" id="numBarras" value="4" min="2" class="w-10 p-0.5 bg-slate-800 border border-slate-700 rounded text-center text-white">
+                </div>
+                <div class="flex-1 flex items-center space-x-1">
+                    <span class="text-slate-400">Calibre:</span>
+                    <select id="diamBarras" class="p-0.5 bg-slate-800 border border-slate-700 rounded text-white text-[10px]">
+                        <option value="4">#4 (1/2")</option>
+                        <option value="5">#5 (5/8")</option>
+                        <option value="6" selected>#6 (3/4")</option>
+                        <option value="8">#8 (1")</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-1">
+                <button id="start-sim" class="col-span-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-1.5 px-2 rounded text-xs tracking-wider uppercase transition-colors">Cargar Viga</button>
+                <button id="reset-sim" class="bg-slate-700 hover:bg-slate-600 text-white font-medium py-1.5 px-2 rounded text-xs transition-colors">Reset</button>
+            </div>
+        </div>
+
+        <input type="hidden" id="fy" value="4200">
+        <input type="hidden" id="recubrimiento" value="4">
+        <span id="fy-val" class="hidden"></span><span id="rec-val" class="hidden"></span><span id="carga-aplicada" class="hidden"></span>
     </div>
 
     <script>
-        // Objeto global para almacenar las instancias de p5
+        // --- COMIENZA TU LÓGICA DE P5.JS ORIGINAL (CON AJUSTES DE COLOR DE FONDO OSCURO) ---
         let p5_instances = {};
-        
-        // Constantes globales
-        const Es = 2000000; // Módulo de elasticidad del acero en kg/cm²
-        const epsilon_c_ult = 0.003; // Deformación última del concreto
-        const diametros_cm2 = { '3': 0.71, '4': 1.29, '5': 1.99, '6': 2.84, '8': 5.07 };
-        const diametros_mm = { '3': 9.5, '4': 12.7, '5': 15.9, '6': 19.1, '8': 25.4 };
+        const Es = 2000000; 
+        const epsilon_c_ult = 0.003; 
+        const diametros_cm2 = { '4': 1.29, '5': 1.99, '6': 2.84, '8': 5.07 };
+        const diametros_mm = { '4': 12.7, '5': 15.9, '6': 19.1, '8': 25.4 };
 
-        // SKETCH PRINCIPAL: VIGA Y DIAGRAMAS DE FUERZAS
         let mainSketch = function(p) {
             let dom = {};
-            let sim = {
-                running: false, beamFailed: false, load: 0, phiMn: 0,
-                beam: { c: 0, epsilon_s: 0 },
-                loadIncrement: 0, failureLoad: 0, Vmax_at_failure: 0
-            };
+            let sim = { running: false, beamFailed: false, load: 0, phiMn: 0, beam: { c: 0, epsilon_s: 0 }, loadIncrement: 0, failureLoad: 0, Vmax_at_failure: 0 };
             
             p.setup = function() {
                 let canvasContainer = p.select('#canvas-container');
-                p.createCanvas(canvasContainer.width, canvasContainer.width * 0.65).parent(canvasContainer);
+                let c = p.createCanvas(canvasContainer.width, canvasContainer.width * 0.75).parent(canvasContainer);
                 p.pixelDensity(1);
-                p.sim = sim; // Adjuntar sim a la instancia para acceso global
-                connectDOM(); addEventListeners();
-                updateBeamProperties(); resetSimulation();
+                p.sim = sim;
+                connectDOM(); addEventListeners(); updateBeamProperties(); resetSimulation();
             };
 
             p.windowResized = function() {
                 let canvasContainer = p.select('#canvas-container');
-                p.resizeCanvas(canvasContainer.width, canvasContainer.width * 0.65);
+                p.resizeCanvas(canvasContainer.width, canvasContainer.width * 0.75);
             };
 
             function connectDOM() {
@@ -195,10 +152,8 @@
                 dom.fcSlider = p.select('#fc'); dom.fySlider = p.select('#fy'); dom.recubrimientoSlider = p.select('#recubrimiento');
                 dom.numBarrasInput = p.select('#numBarras'); dom.diamBarrasSelect = p.select('#diamBarras');
                 dom.longitudVal = p.select('#longitud-val'); dom.baseVal = p.select('#base-val'); dom.alturaVal = p.select('#altura-val');
-                dom.fcVal = p.select('#fc-val'); dom.fyVal = p.select('#fy-val'); dom.recVal = p.select('#rec-val');
-                dom.asVal = p.select('#as-val');
-                dom.startBtn = p.select('#start-sim'); dom.resetBtn = p.select('#reset-sim');
-                dom.failureTypeEl = p.select('#failure-type');
+                dom.fcVal = p.select('#fc-val'); dom.fyVal = p.select('#fy-val'); dom.recVal = p.select('#rec-val'); dom.asVal = p.select('#as-val');
+                dom.startBtn = p.select('#start-sim'); dom.resetBtn = p.select('#reset-sim'); dom.failureTypeEl = p.select('#failure-type');
             }
 
             function addEventListeners() {
@@ -206,12 +161,12 @@
                     if (!sim.beamFailed && sim.phiMn > 0) {
                         sim.failureLoad = (8 * sim.phiMn) / (sim.beam.L * sim.beam.L);
                         sim.Vmax_at_failure = sim.failureLoad * sim.beam.L / 2;
-                        sim.loadIncrement = sim.failureLoad / (4 * 60);
+                        sim.loadIncrement = sim.failureLoad / (3 * 60); // Ajustado para durar 3 segundos en animación
                         sim.running = true;
                     }
                 });
                 dom.resetBtn.mousePressed(resetSimulation);
-                [dom.longitudSlider, dom.baseSlider, dom.alturaSlider, dom.fcSlider, dom.fySlider, dom.recubrimientoSlider, dom.numBarrasInput, dom.diamBarrasSelect].forEach(input => {
+                [dom.longitudSlider, dom.baseSlider, dom.alturaSlider, dom.fcSlider, dom.numBarrasInput, dom.diamBarrasSelect].forEach(input => {
                     input.input(updateBeamProperties);
                 });
             }
@@ -223,8 +178,7 @@
                 sim.beam.As = sim.beam.numBarras * diametros_cm2[sim.beam.diamKey];
                 dom.longitudVal.html(parseFloat(sim.beam.L).toFixed(1)); dom.baseVal.html(parseFloat(sim.beam.b).toFixed(0));
                 dom.alturaVal.html(parseFloat(sim.beam.h).toFixed(0)); dom.fcVal.html(parseFloat(sim.beam.fc).toFixed(0));
-                dom.fyVal.html(parseFloat(sim.beam.fy).toFixed(0)); dom.recVal.html(parseFloat(sim.beam.rec).toFixed(1));
-                dom.asVal.html(parseFloat(sim.beam.As).toFixed(2));
+                dom.asVal.html(parseFloat(sim.beam.As).toFixed(1));
                 calculateResistantMoment(); resetSimulation();
             }
 
@@ -242,15 +196,15 @@
                 const a = beta1 * c; const Mn = sim.beam.As * fs * (d - a / 2);
                 sim.phiMn = phi * Mn / 100;
                 updateFailureType(epsilon_s, epsilon_y);
-                p.select('#momento-res').html(`${sim.phiMn.toLocaleString('es-MX', {maximumFractionDigits: 0})} kg-m`);
+                p.select('#momento-res').html(`${Math.round(sim.phiMn).toLocaleString('es-MX')} kg-m`);
             }
 
             function updateFailureType(epsilon_s, epsilon_y) {
                 let msg, color;
-                if (epsilon_s >= 0.005) { msg = "Dúctil (Tensión)"; color = "text-green-600"; } 
-                else if (epsilon_s <= epsilon_y) { msg = "Frágil (Compresión)"; color = "text-red-600"; }
-                else { msg = "En Transición"; color = "text-orange-500"; }
-                dom.failureTypeEl.html(msg).class(`text-xl font-bold ${color}`);
+                if (epsilon_s >= 0.005) { msg = "DÚCTIL"; color = "text-emerald-400"; } 
+                else if (epsilon_s <= epsilon_y) { msg = "FRÁGIL"; color = "text-rose-500"; }
+                else { msg = "TRANSICIÓN"; color = "text-amber-400"; }
+                dom.failureTypeEl.html(msg).class(`font-bold ${color}`);
             }
             
             function findNeutralAxis(beam) {
@@ -268,24 +222,23 @@
 
             function resetSimulation() {
                 sim.running = false; sim.beamFailed = false; sim.load = 0; sim.loadIncrement = 0;
-                updateStatus('Presiona "Iniciar Simulación"', 'bg-blue-100', 'text-blue-800');
+                updateStatus('Carga en reposo', 'bg-slate-900', 'text-slate-400 border border-slate-800');
                 if (p5_instances.strainProfile) p5_instances.strainProfile.update(0);
                 if (p5_instances.crossSection) p5_instances.crossSection.update();
                 p.loop();
             }
 
-            function updateStatus(message, bgColor, textColor) { p.select('#status-message').html(message).class(`p-4 mb-4 text-center font-bold text-xl rounded-lg ${bgColor} ${textColor}`); }
+            function updateStatus(message, bgColor, textColor) { p.select('#status-message').html(message).class(`py-1 text-center font-bold text-sm rounded-md mx-2 ${bgColor} ${textColor}`); }
 
             p.draw = function() {
-                p.background(248, 250, 252);
-                if (sim.running && !sim.beamFailed) { sim.load += sim.loadIncrement; updateStatus('Simulación en curso...', 'bg-yellow-100', 'text-yellow-800'); }
+                p.background(11, 15, 25); // Fondo oscuro unificado
+                if (sim.running && !sim.beamFailed) { sim.load += sim.loadIncrement; updateStatus('Incrementando Carga...', 'bg-amber-500/20', 'text-amber-400 border border-amber-500/50'); }
                 let Mu = (sim.load * sim.beam.L * sim.beam.L) / 8;
                 if (Mu >= sim.phiMn && !sim.beamFailed && sim.phiMn > 0) {
                     sim.beamFailed = true; sim.running = false; Mu = sim.phiMn; sim.load = sim.failureLoad;
-                    updateStatus(`¡FALLA ESTRUCTURAL!`, 'bg-red-200', 'text-red-800'); p.noLoop();
+                    updateStatus('¡FALLA ESTRUCTURAL DE LA VIGA!', 'bg-rose-500/20', 'text-rose-400 border border-rose-500/50'); p.noLoop();
                 }
-                p.select('#carga-aplicada').html(`${sim.load.toFixed(2)} kg/m`);
-                p.select('#momento-max').html(`${Mu.toLocaleString('es-MX', {maximumFractionDigits: 0})} kg-m`);
+                p.select('#momento-max').html(`${Math.round(Mu).toLocaleString('es-MX')} kg-m`);
                 let progress = sim.phiMn > 0 ? Mu / sim.phiMn : 0;
                 if (p5_instances.strainProfile) p5_instances.strainProfile.update(progress);
                 if (p5_instances.crossSection) p5_instances.crossSection.update();
@@ -296,76 +249,51 @@
                 const marginX = p.width * 0.12; const beamY = p.height * 0.35;
                 const beamLen = p.width - 2 * marginX; const { L, h, fc, b } = sim.beam;
                 p.push(); p.translate(marginX, beamY);
-                p.fill(120); p.noStroke(); p.triangle(0, 0, -15, 20, 15, 20);
-                p.triangle(beamLen, 0, beamLen - 15, 20, beamLen + 15, 20); p.ellipse(beamLen, 25, 30, 10);
+                p.fill(150); p.noStroke(); p.triangle(0, 0, -10, 15, 10, 15);
+                p.triangle(beamLen, 0, beamLen - 10, 15, beamLen + 10, 15);
                 if (sim.load > 0) {
-                    p.fill(255, 165, 0, 150);
+                    p.fill(245, 158, 11, 150); // Naranja neón para vectores de carga
                     const maxLoadForScale = sim.failureLoad > 0 ? sim.failureLoad * 1.1 : 10000;
-                    const loadHeight = p.map(sim.load, 0, maxLoadForScale, 0, 40);
-                    for (let x = 0; x <= beamLen; x += 12) arrow(x, -loadHeight - h/4 - 5, 0, loadHeight);
+                    const loadHeight = p.map(sim.load, 0, maxLoadForScale, 0, 30);
+                    for (let x = 0; x <= beamLen; x += 15) arrow(x, -loadHeight - 8, 0, loadHeight);
                 }
                 if (sim.load > 0 && sim.phiMn > 0) {
                     const L_cm = L * 100;
                     const flecha_max_cm = (5 * (sim.load / 100) * L_cm**4) / (384 * (15000 * p.sqrt(fc)) * (b * h**3 / 12));
                     const flecha_visible = flecha_max_cm * ((p.height * 0.25) / (L_cm / 240));
-                    p.noFill(); p.stroke(sim.beamFailed ? '#ef4444' : '#3b82f6'); p.strokeWeight(h/2);
+                    p.noFill(); p.stroke(sim.beamFailed ? '#f43f5e' : '#3b82f6'); p.strokeWeight(5);
                     p.beginShape(); p.curveVertex(0, 0); p.curveVertex(0, 0);
                     for (let x = 0; x <= beamLen; x += 10) p.curveVertex(x, 4 * flecha_visible * (x / beamLen - (x/beamLen)**2));
                     p.curveVertex(beamLen, 0); p.curveVertex(beamLen, 0); p.endShape();
-                    const failY = 4 * flecha_visible * 0.25;
-                    p.stroke(0, 100); p.strokeWeight(1); p.drawingContext.setLineDash([5, 5]);
-                    p.line(beamLen/2, 0, beamLen/2, failY); p.drawingContext.setLineDash([]);
-                    p.fill(0); p.noStroke(); p.textAlign(p.CENTER, p.BOTTOM);
-                    p.text(`Flecha: ${flecha_max_cm.toFixed(2)} cm`, beamLen/2, failY - 5);
-                    if (sim.beamFailed) {
-                        p.fill(255, 0, 0); p.noStroke(); p.ellipse(beamLen / 2, failY, 20, 20);
-                        p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.text('!', beamLen / 2, failY);
-                    }
                 }
-                p.noFill(); p.stroke(50); p.strokeWeight(2); p.rect(0, -h/4, beamLen, h/2);
-                p.stroke(100); p.strokeWeight(1); p.line(-10, 40, beamLen+10, 40);
-                p.line(0, 35, 0, 45); p.line(beamLen, 35, beamLen, 45);
-                p.fill(50); p.noStroke(); p.textAlign(p.CENTER, p.TOP);
-                p.text(`L = ${L} m`, beamLen/2, 50);
+                p.noFill(); p.stroke(180); p.strokeWeight(1.5); p.rect(0, -5, beamLen, 10);
                 p.pop();
                 drawDiagrams(Mu, marginX, beamLen);
             }
 
             function drawDiagrams(Mu, marginX, beamLen) {
-                const diagramY_V = p.height * 0.70; const diagramY_M = p.height * 0.90; const diagramH = p.height * 0.12;
+                const diagramY_V = p.height * 0.68; const diagramY_M = p.height * 0.88; const diagramH = p.height * 0.10;
                 const Vmax = (sim.load * sim.beam.L) / 2;
                 const escalaV = sim.Vmax_at_failure > 0 ? diagramH / sim.Vmax_at_failure : 0;
                 const escalaM = sim.phiMn > 0 ? diagramH / (sim.phiMn * 1.1) : 0;
-                drawSingleDiagram('Cortante (V)', marginX, diagramY_V, beamLen, (x_norm) => (0.5 - x_norm) * 2 * Vmax * escalaV, Vmax);
-                drawSingleDiagram('Momento (M)', marginX, diagramY_M, beamLen, (x_norm) => 4 * Mu * (x_norm - x_norm**2) * escalaM, Mu, true);
+                drawSingleDiagram('V', marginX, diagramY_V, beamLen, (x_norm) => (0.5 - x_norm) * 2 * Vmax * escalaV, '#00FFFF');
+                drawSingleDiagram('M', marginX, diagramY_M, beamLen, (x_norm) => 4 * Mu * (x_norm - x_norm**2) * escalaM, '#FF00FF');
             }
 
-            function drawSingleDiagram(title, x, y, w, func, val, isMoment = false) {
+            function drawSingleDiagram(title, x, y, w, func, colorHex) {
                 p.push(); p.translate(x, y);
-                p.stroke(150); p.strokeWeight(1.5); p.line(0, -40, 0, 40);
-                p.noStroke(); p.fill(37, 99, 235, 100);
+                p.stroke(50); p.line(0, -25, 0, 25);
+                p.noStroke(); let c = p.color(colorHex); c.setAlpha(40); p.fill(c);
                 p.beginShape(); p.vertex(0, 0);
                 for (let i = 0; i <= w; i++) p.vertex(i, -func(i / w));
                 p.vertex(w, 0); p.endShape(p.CLOSE);
-                p.stroke(150); p.strokeWeight(1.5); p.line(0,0,w,0);
-                p.noStroke(); p.fill(50); p.textAlign(p.RIGHT, p.CENTER);
-                p.text(title, -15, 0);
-                if (isMoment) {
-                    p.textAlign(p.CENTER, p.BOTTOM);
-                    p.text(val.toFixed(0) + ' kg-m', w/2, -Math.abs(func(0.5)) - 5);
-                } else {
-                    p.textAlign(p.LEFT, p.CENTER);
-                    p.text('+' + val.toFixed(0) + ' kg', 5, -Math.abs(func(0)) + 15);
-                    p.textAlign(p.RIGHT, p.CENTER);
-                    p.text(-val.toFixed(0) + ' kg', w - 5, Math.abs(func(1)) - 15);
-                }
+                p.stroke(colorHex); p.strokeWeight(1.5); p.line(0,0,w,0);
+                p.noStroke(); p.fill(200); p.textSize(10); p.textAlign(p.RIGHT, p.CENTER); p.text(title, -8, 0);
                 p.pop();
             }
 
             function arrow(x, y, angle, len) {
-                p.push(); p.translate(x, y); p.rotate(angle);
-                p.line(0, 0, 0, len); p.triangle(0, len, -3, len - 3, 3, len - 3);
-                p.pop();
+                p.push(); p.translate(x, y); p.rotate(angle); p.stroke(245, 158, 11); p.line(0, 0, 0, len); p.fill(245, 158, 11); p.triangle(0, len, -2, len - 3, 2, len - 3); p.pop();
             }
         };
 
@@ -377,39 +305,25 @@
                 p.createCanvas(containerEl.offsetWidth, containerEl.offsetHeight).parent(containerEl);
                 p.noLoop();
             };
-            p.windowResized = function() { p.resizeCanvas(p.select('#strain-profile-container').width, p.select('#strain-profile-container').height); };
             p.update = function(newProgress) {
                 progress = p.constrain(newProgress, 0, 1);
                 if (p5_instances.main && p5_instances.main.sim) beamParams = p5_instances.main.sim.beam;
                 p.redraw();
             };
             p.draw = function() {
-                p.background(241, 245, 249);
+                p.background(15, 23, 42); // Fondo oscuro complementario
                 if (!beamParams || !beamParams.h) return;
-                const { h, c, epsilon_s, rec } = beamParams;
-                if (c <= 0) return;
+                const { h, c, epsilon_s, rec } = beamParams; if (c <= 0) return;
                 const current_epsilon_c = progress * epsilon_c_ult;
                 const current_epsilon_s = progress * epsilon_s;
-                p.push();
-                p.translate(p.width / 2, p.height / 2); p.scale(p.height / h * 0.7);
-                p.translate(0, -h/2);
-                p.stroke(200); p.line(0, 0, 0, h);
+                p.push(); p.translate(p.width / 2, p.height / 2); p.scale(p.height / h * 0.7); p.translate(0, -h/2);
+                p.stroke(80); p.line(0, 0, 0, h);
                 const max_abs_strain = Math.max(epsilon_c_ult, epsilon_s);
                 const scaleX = (p.width / 2.5) / max_abs_strain / (p.height / h * 0.7) ;
-                p.stroke(239, 68, 68); p.strokeWeight(2); p.fill(239, 68, 68, 50);
+                p.stroke('#f43f5e'); p.strokeWeight(2); p.fill(244, 63, 94, 40);
                 p.triangle(0, c, current_epsilon_c * scaleX, 0, 0, 0);
                 p.triangle(0, c, -current_epsilon_s * scaleX, h - rec, 0, h - rec);
-                p.stroke(37, 99, 235, 150); p.strokeWeight(1.5); p.line(-p.width, c, p.width, c);
-                
-                p.noStroke(); p.fill(50);
-                const unscale = 1/(p.height / h * 0.7);
-                p.textSize(12 * unscale);
-                
-                p.textAlign(p.RIGHT, p.BOTTOM);
-                p.text(`εc=${current_epsilon_c.toFixed(5)}`, -5, 0);
-
-                p.textAlign(p.LEFT, p.TOP);
-                p.text(`εs=${current_epsilon_s.toFixed(5)}`, 5, h - rec);
+                p.stroke(37, 99, 235, 100); p.line(-p.width, c, p.width, c);
                 p.pop();
             };
         };
@@ -422,36 +336,25 @@
                 p.createCanvas(containerEl.offsetWidth, containerEl.offsetHeight).parent(containerEl);
                 p.noLoop();
             };
-            p.windowResized = function() { p.resizeCanvas(p.select('#cross-section-container').width, p.select('#cross-section-container').height); };
             p.update = function() {
                 if (p5_instances.main && p5_instances.main.sim) beamParams = p5_instances.main.sim.beam;
                 p.redraw();
             };
             p.draw = function() {
-                p.background(241, 245, 249);
+                p.background(15, 23, 42);
                 if (!beamParams || !beamParams.h) return;
-                const { h, b, rec, numBarras, diamKey } = beamParams;
-                const d = h - rec;
-                p.push();
-                p.translate(p.width/2, p.height/2);
-                const scaleFactor = p.min(p.width / (b * 1.6), p.height / (h * 1.6));
+                const { h, b, rec, numBarras, diamKey } = beamParams; const d = h - rec;
+                p.push(); p.translate(p.width/2, p.height/2);
+                const scaleFactor = p.min(p.width / (b * 1.5), p.height / (h * 1.5));
                 p.scale(scaleFactor); p.translate(-b/2, -h/2);
-                p.stroke(100); p.fill(200); p.rect(0,0,b,h);
+                p.stroke(100); p.fill(71, 85, 105); p.rect(0,0,b,h);
                 const barDiameter = diametros_mm[diamKey] / 10;
                 const spacing = numBarras > 1 ? (b - 2 * rec - barDiameter) / (numBarras - 1) : 0;
-                p.fill(80); p.noStroke();
+                p.fill('#ea580c'); p.noStroke(); // Varillas en naranja brillante
                 for (let i = 0; i < numBarras; i++) {
                     let x_pos = numBarras > 1 ? rec + barDiameter / 2 + i * spacing : b / 2;
                     p.ellipse(x_pos, d, barDiameter, barDiameter);
                 }
-                const textSize = 16 / scaleFactor;
-                p.textSize(textSize);
-                p.stroke(0); p.fill(0); p.textAlign(p.CENTER, p.BOTTOM);
-                p.line(0, -textSize*0.4, b, -textSize*0.4); p.text(`b=${b}cm`, b/2, -textSize*0.6);
-                p.textAlign(p.LEFT, p.CENTER);
-                p.line(b+textSize*0.4, 0, b+textSize*0.4, h); p.text(`h=${h}cm`, b+textSize*0.6, h/2);
-                p.textAlign(p.RIGHT, p.CENTER);
-                p.line(-textSize*0.4, 0, -textSize*0.4, d); p.text(`d=${d.toFixed(1)}cm`, -textSize*0.6, d/2);
                 p.pop();
             };
         };
@@ -459,8 +362,7 @@
         function startSketchesWhenReady() {
             const mainC = document.getElementById('canvas-container');
             const strainC = document.getElementById('strain-profile-container');
-            const crossC = document.getElementById('cross-section-container');
-            if (mainC && strainC && crossC && mainC.offsetWidth > 0 && strainC.offsetWidth > 0) {
+            if (mainC && strainC && mainC.offsetWidth > 0) {
                 p5_instances.main = new p5(mainSketch);
                 p5_instances.strainProfile = new p5(strainProfileSketch);
                 p5_instances.crossSection = new p5(crossSectionSketch);
@@ -469,8 +371,6 @@
             }
         }
         window.onload = startSketchesWhenReady;
-
     </script>
-
 </body>
 </html>
