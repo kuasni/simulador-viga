@@ -14,138 +14,127 @@
         }
 
         body {
-            background-color: #0d0f14;
+            background-color: #0b0f19;
             color: #e2e8f0;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             min-height: 100vh;
-            padding: 15px;
-            overflow-x: hidden;
+            overflow: hidden; /* Evita el scroll en el celular */
         }
 
-        /* Contenedor vertical optimizado para formato TikTok (9:16) */
+        /* Contenedor 9:16 estricto */
         .tiktok-container {
             width: 100%;
-            max-width: 430px;
-            background: #141822;
-            border: 2px solid #00ffff;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            max-width: 400px;
+            height: 100vh;
+            max-height: 800px;
+            background: #111827;
+            border: 1px solid #1e293b;
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.05);
         }
 
-        /* Encabezado del canal */
+        /* Encabezado */
         .header {
             text-align: center;
-            border-bottom: 2px dashed #334155;
-            padding-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #334155;
         }
 
         .header h1 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: #00ffff;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
         }
 
         .header p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #94a3b8;
-            margin-top: 2px;
         }
 
-        /* Alerta de Estado Estructural */
+        /* Alerta */
         #alert-panel {
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.15);
             border: 1px solid #10b981;
             color: #10b981;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 6px;
             text-align: center;
-            font-weight: bold;
-            font-size: 0.95rem;
+            font-weight: 700;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         #alert-panel.danger {
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.15);
             border: 1px solid #ef4444;
             color: #ef4444;
-            animation: pulse 1.5s infinite;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-            100% { opacity: 0.8; }
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        /* Bloque Visual Principal: Sección Izquierda y Gráfico Derecha */
-        .visual-block {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            align-items: stretch;
+        /* Cajas Visuales Apiladas */
+        .visual-box {
+            background: #0f1420;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            position: relative;
+            width: 100%;
         }
 
-        /* Panel de la Sección Transversal de Concreto */
+        .box-title {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 10;
+        }
+
+        /* Sección Transversal (Altura Fija) */
         .section-box {
-            background: #0d0f14;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            padding: 10px;
+            height: 140px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: relative;
-            min-height: 180px;
+            padding-top: 15px;
         }
 
-        .section-title {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            position: absolute;
-            top: 6px;
-            left: 10px;
-            text-transform: uppercase;
-        }
-
-        /* Dibujo SVG de la viga física */
         #beam-svg {
             width: 100%;
-            height: 150px;
-            margin-top: 15px;
+            height: 100%;
         }
 
-        /* Contenedor del Gráfico de Comportamiento */
+        /* Gráfico (Flex para llenar espacio) */
         .chart-box {
-            background: #0d0f14;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 180px;
+            flex-grow: 1;
+            min-height: 150px;
+            padding: 25px 10px 10px 10px;
         }
 
-        /* Panel de Controles y Sliders */
+        /* Controles Inferiores */
         .controls-card {
-            background: #1e2530;
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid #475569;
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 15px;
         }
 
         .control-group {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .control-group:last-child {
@@ -157,7 +146,7 @@
             justify-content: space-between;
             font-size: 0.85rem;
             color: #cbd5e1;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .control-label span.value {
@@ -168,27 +157,24 @@
         input[type="range"] {
             width: 100%;
             accent-color: #00ffff;
-            cursor: pointer;
         }
 
-        /* Botón de Acción Principal */
         .btn-action {
             width: 100%;
-            background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+            background: linear-gradient(90deg, #00ffff, #3b82f6);
             border: none;
-            color: #ffffff;
+            color: #fff;
             padding: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 6px;
             cursor: pointer;
             text-transform: uppercase;
-            box-shadow: 0 4px 12px rgba(255, 0, 255, 0.3);
-            transition: transform 0.1s ease;
+            margin-top: 5px;
         }
-
+        
         .btn-action:active {
-            transform: scale(0.98);
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -197,40 +183,39 @@
     <div class="tiktok-container">
         <div class="header">
             <h1>Strukturarte</h1>
-            <p>Diseño de Vigas de Concreto Reforzado</p>
+            <p>Diseño de Vigas de Concreto</p>
         </div>
 
-        <div id="alert-panel">Estado: Sección Dúctil (Correcta)</div>
+        <div id="alert-panel">Sección Dúctil Segura</div>
 
-        <div class="visual-block">
-            <div class="section-box">
-                <div class="section-title">Sección Transversal</div>
-                <svg id="beam-svg"></svg>
-            </div>
+        <div class="visual-box section-box">
+            <div class="box-title">Sección Transversal</div>
+            <svg id="beam-svg"></svg>
+        </div>
 
-            <div class="chart-box">
-                <canvas id="canvas-grafico"></canvas>
-            </div>
+        <div class="visual-box chart-box">
+            <div class="box-title">Momento Resistente</div>
+            <canvas id="canvas-grafico"></canvas>
         </div>
 
         <div class="controls-card">
             <div class="control-group">
-                <div class="control-label">Base de la viga (b) <span class="value" id="val-b">30 cm</span></div>
-                <input type="range" id="slide-b" min="20" max="50" value="30">
+                <div class="control-label">Base (b) <span class="value" id="val-b">30 cm</span></div>
+                <input type="range" id="slide-b" min="15" max="60" value="30">
             </div>
 
             <div class="control-group">
-                <div class="control-label">Peralte total (h) <span class="value" id="val-h">50 cm</span></div>
-                <input type="range" id="slide-h" min="30" max="70" value="50">
+                <div class="control-label">Peralte (h) <span class="value" id="val-h">50 cm</span></div>
+                <input type="range" id="slide-h" min="30" max="80" value="50">
             </div>
 
             <div class="control-group">
-                <div class="control-label">Número de varillas (As) <span class="value" id="val-varillas">3 varillas</span></div>
-                <input type="range" id="slide-varillas" min="2" max="8" value="3">
+                <div class="control-label">Varillas (As) <span class="value" id="val-varillas">3 varillas</span></div>
+                <input type="range" id="slide-varillas" min="2" max="10" value="3">
             </div>
         </div>
 
-        <button class="btn-action" onclick="calcularYAnimar()">Cargar Viga</button>
+        <button class="btn-action" onclick="calcularYAnimar()">Aplicar Carga</button>
     </div>
 
     <script>
@@ -241,15 +226,15 @@
             grafico = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: [0, 1, 2, 3, 4, 5],
+                    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                     datasets: [{
-                        label: 'Momento (kN·m)',
-                        data: [0, 0, 0, 0, 0, 0],
-                        borderColor: '#ff00ff',
+                        label: 'Momento',
+                        data: Array(11).fill(0),
+                        borderColor: '#00ffff',
                         borderWidth: 3,
-                        backgroundColor: 'rgba(255, 0, 255, 0.1)',
+                        backgroundColor: 'rgba(0, 255, 255, 0.1)',
                         fill: true,
-                        tension: 0.3,
+                        tension: 0.4,
                         pointRadius: 0
                     }]
                 },
@@ -258,8 +243,12 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { grid: { color: '#232b3c' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-                        y: { grid: { color: '#232b3c' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+                        x: { display: false },
+                        y: { 
+                            grid: { color: '#1e293b' }, 
+                            ticks: { color: '#64748b', font: { size: 10 } },
+                            beginAtZero: true
+                        }
                     }
                 }
             });
@@ -267,61 +256,50 @@
 
         function dibujarSeccion(b, h, numVarillas) {
             const svg = document.getElementById('beam-svg');
-            svg.innerHTML = ''; // Limpiar previo
+            svg.innerHTML = ''; 
 
-            const svgW = svg.clientWidth || 180;
-            const svgH = svg.clientHeight || 150;
+            // Dimensiones lógicas fijas para el SVG para evitar colapsos
+            const svgW = 350; 
+            const svgH = 120;
+            svg.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
 
-            // Escalamiento dinámico para que la viga quepa bien en su cuadro
-            const escala = Math.min((svgW - 40) / b, (svgH - 40) / h);
+            // Escala calculada con un padding protector
+            const pad = 20;
+            const escala = Math.min((svgW - pad) / b, (svgH - pad) / h);
             const wDibujo = b * escala;
             const hDibujo = h * escala;
 
-            // Centrar dibujo dentro del SVG
             const x0 = (svgW - wDibujo) / 2;
             const y0 = (svgH - hDibujo) / 2;
 
-            // 1. Dibujar Bloque de Concreto
+            // Bloque Concreto
             const concreto = document.createElementNS("http://www.w3.org/2000/svg", "rect");
             concreto.setAttribute("x", x0);
             concreto.setAttribute("y", y0);
             concreto.setAttribute("width", wDibujo);
             concreto.setAttribute("height", hDibujo);
-            concreto.setAttribute("fill", "#2d3748");
-            concreto.setAttribute("stroke", "#ffffff");
-            concreto.setAttribute("stroke-width", "3");
-            concreto.setAttribute("rx", "4");
+            concreto.setAttribute("fill", "#1e293b");
+            concreto.setAttribute("stroke", "#475569");
+            concreto.setAttribute("stroke-width", "2");
             svg.appendChild(concreto);
 
-            // 2. Dibujar Estribo perimetral (Capa de recubrimiento simulación)
-            const recubrimiento = 15; 
-            if (wDibujo > recubrimiento * 2 && hDibujo > recubrimiento * 2) {
-                const estribo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                estribo.setAttribute("x", x0 + 10);
-                estribo.setAttribute("y", y0 + 10);
-                estribo.setAttribute("width", wDibujo - 20);
-                estribo.setAttribute("height", hDibujo - 20);
-                estribo.setAttribute("fill", "none");
-                estribo.setAttribute("stroke", "#4a5568");
-                estribo.setAttribute("stroke-width", "1.5");
-                svg.appendChild(estribo);
-            }
-
-            // 3. Dibujar Varillas de Acero de Refuerzo (Fila inferior)
-            const yVarillas = y0 + hDibujo - 20;
-            const xInicio = x0 + 20;
-            const xFin = x0 + wDibujo - 20;
+            // Varillas
+            const recubrimientoVisual = 10;
+            const yVarillas = y0 + hDibujo - recubrimientoVisual;
+            const xInicio = x0 + recubrimientoVisual;
+            const xFin = x0 + wDibujo - recubrimientoVisual;
             const paso = numVarillas > 1 ? (xFin - xInicio) / (numVarillas - 1) : 0;
+            
+            // Radio de varilla proporcional pero con límite para que no se encimen
+            const radioVarilla = Math.min(wDibujo / (numVarillas * 3), 6); 
 
             for (let i = 0; i < numVarillas; i++) {
                 const cx = numVarillas > 1 ? xInicio + (paso * i) : (xInicio + xFin) / 2;
                 const varilla = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 varilla.setAttribute("cx", cx);
-                varilla.setAttribute("cy", yVarillas);
-                varilla.setAttribute("r", "7"); // Tamaño visual claro de la varilla
+                varilla.setAttribute("cy", yVarillas - radioVarilla);
+                varilla.setAttribute("r", radioVarilla);
                 varilla.setAttribute("fill", "#00ffff");
-                varilla.setAttribute("stroke", "#ffffff");
-                varilla.setAttribute("stroke-width", "1");
                 svg.appendChild(varilla);
             }
         }
@@ -331,41 +309,42 @@
             const h = parseFloat(document.getElementById('slide-h').value);
             const n = parseInt(document.getElementById('slide-varillas').value);
 
-            // Área de acero aproximada (Varillas No. 5 estándar ~ 2 cm² c/u)
-            const As = n * 2.0; 
-            const d = h - 5; // Peralte efectivo
-            const fy = 420;  // Grado 420 MPa
-            const fc = 250;  // f'c 250 kg/cm²
+            const As = n * 2.84; // Usando varilla #6 aprox
+            const d = h - 5; 
+            const fy = 4200;  
+            const fc = 250;  
 
-            // Cuantía de acero
             const rho = As / (b * d);
-            const rhoMax = 0.016; // Límite reglamentario aproximado para falla dúctil
+            const rhoMax = (0.85 * 0.85 * fc / fy) * (6000 / (6000 + fy));
 
             const alertPanel = document.getElementById('alert-panel');
             
-            // Evaluar condición de falla estructural por sobre-refuerzo
             if (rho > rhoMax) {
-                alertPanel.innerText = "¡FALLA ESTRUCTURAL! SECCIÓN FRÁGIL";
+                alertPanel.innerText = "¡FALLA FRÁGIL! (SOBRE-REFORZADA)";
                 alertPanel.className = "danger";
+                grafico.data.datasets[0].borderColor = '#ef4444';
+                grafico.data.datasets[0].backgroundColor = 'rgba(239, 68, 68, 0.1)';
             } else {
-                alertPanel.innerText = "Estado: Sección Dúctil (Diseño Seguro)";
+                alertPanel.innerText = "FALLA DÚCTIL (DISEÑO SEGURO)";
                 alertPanel.className = "";
+                grafico.data.datasets[0].borderColor = '#00ffff';
+                grafico.data.datasets[0].backgroundColor = 'rgba(0, 255, 255, 0.1)';
             }
 
-            // Generar curva momento-curvatura sintética para animación
-            const mMax = (As * fy * (d - (As * fy) / (1.7 * fc * b))) / 100; // Momento nominal en kN·m
+            const a = (As * fy) / (0.85 * fc * b);
+            const Mn = (As * fy * (d - a / 2)) / 100000; // a kN-m aprox
             
             let datosPasos = [];
-            let etiquetas = [];
             for (let i = 0; i <= 10; i++) {
-                etiquetas.push((i * 0.003).toFixed(3));
-                // Curva plástica parabólica
-                let factor = Math.sin((i / 10) * (Math.PI / 2));
-                datosPasos.push(mMax * factor);
+                // Si es frágil, la curva cae abruptamente al final
+                if (rho > rhoMax && i > 8) {
+                    datosPasos.push(Mn * 0.5); 
+                } else {
+                    let factor = Math.sin((i / 10) * (Math.PI / 2));
+                    datosPasos.push(Mn * factor);
+                }
             }
 
-            // Animación progresiva del gráfico de Chart.js
-            grafico.data.labels = etiquetas;
             grafico.data.datasets[0].data = Array(11).fill(0);
             grafico.update();
 
@@ -373,43 +352,35 @@
             const intervalo = setInterval(() => {
                 if (pasoActual <= 10) {
                     grafico.data.datasets[0].data[pasoActual] = datosPasos[pasoActual];
-                    grafico.update('none'); // Update suave sin saltar
+                    grafico.update('none'); 
                     pasoActual++;
                 } else {
                     clearInterval(intervalo);
                 }
-            }, 60);
+            }, 50);
         }
 
-        // Sincronizar Sliders y actualización en tiempo real al mover controles
         function vincularControles() {
-            const inputs = [
-                { id: 'slide-b', valId: 'val-b', sufijo: ' cm' },
-                { id: 'slide-h', valId: 'val-h', sufijo: ' cm' },
-                { id: 'slide-varillas', valId: 'val-varillas', sufijo: ' varillas' }
-            ];
-
-            inputs.forEach(item => {
-                const slider = document.getElementById(item.id);
-                const etiqueta = document.getElementById(item.valId);
-
-                const actualizar = () => {
-                    etiqueta.innerText = slider.value + item.sufijo;
-                    const b = document.getElementById('slide-b').value;
-                    const h = document.getElementById('slide-h').value;
-                    const n = document.getElementById('slide-varillas').value;
-                    dibujarSeccion(b, h, n);
-                };
-
-                slider.addEventListener('input', actualizar);
+            const inputs = ['b', 'h', 'varillas'];
+            inputs.forEach(id => {
+                const slider = document.getElementById(`slide-${id}`);
+                const etiqueta = document.getElementById(`val-${id}`);
+                
+                slider.addEventListener('input', () => {
+                    const sufijo = id === 'varillas' ? ' varillas' : ' cm';
+                    etiqueta.innerText = slider.value + sufijo;
+                    dibujarSeccion(
+                        document.getElementById('slide-b').value,
+                        document.getElementById('slide-h').value,
+                        document.getElementById('slide-varillas').value
+                    );
+                });
             });
         }
 
-        // Inicialización al cargar la ventana
         window.onload = () => {
             inicializarGrafico();
             vincularControles();
-            // Dibujo inicial estándar
             dibujarSeccion(30, 50, 3);
         };
     </script>
