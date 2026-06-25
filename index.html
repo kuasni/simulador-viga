@@ -3,385 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Strukturarte - Simulador de Viga</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Strukturarte - Simulador de Concreto Reforzado</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            background-color: #0b0f19;
-            color: #e2e8f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden; /* Evita el scroll en el celular */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #090d16;
         }
-
-        /* Contenedor 9:16 estricto */
-        .tiktok-container {
-            width: 100%;
-            max-width: 400px;
-            height: 100vh;
-            max-height: 800px;
-            background: #111827;
-            border: 1px solid #1e293b;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.05);
-        }
-
-        /* Encabezado */
-        .header {
-            text-align: center;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #334155;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            color: #00ffff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-        }
-
-        .header p {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
-        /* Alerta */
-        #alert-panel {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid #10b981;
-            color: #10b981;
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            transition: all 0.3s;
-        }
-
-        #alert-panel.danger {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid #ef4444;
-            color: #ef4444;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
-        /* Cajas Visuales Apiladas */
-        .visual-box {
-            background: #0f1420;
-            border: 1px solid #1e293b;
-            border-radius: 8px;
-            position: relative;
-            width: 100%;
-        }
-
-        .box-title {
-            position: absolute;
-            top: 5px;
-            left: 10px;
-            font-size: 0.7rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            z-index: 10;
-        }
-
-        /* Sección Transversal (Altura Fija) */
-        .section-box {
-            height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-top: 15px;
-        }
-
-        #beam-svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Gráfico (Flex para llenar espacio) */
-        .chart-box {
-            flex-grow: 1;
-            min-height: 150px;
-            padding: 25px 10px 10px 10px;
-        }
-
-        /* Controles Inferiores */
-        .controls-card {
-            background: #1e293b;
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        .control-group {
-            margin-bottom: 12px;
-        }
-
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .control-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: #cbd5e1;
-            margin-bottom: 5px;
-        }
-
-        .control-label span.value {
-            color: #00ffff;
-            font-weight: bold;
-        }
-
-        input[type="range"] {
-            width: 100%;
+        input[type=range] {
             accent-color: #00ffff;
-        }
-
-        .btn-action {
-            width: 100%;
-            background: linear-gradient(90deg, #00ffff, #3b82f6);
-            border: none;
-            color: #fff;
-            padding: 12px;
-            font-size: 1.1rem;
-            font-weight: 800;
-            border-radius: 6px;
             cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 5px;
         }
-        
-        .btn-action:active {
-            opacity: 0.8;
+        /* Desactivar scroll global para fijar el encuadre en el celular */
+        html, body {
+            overflow: hidden;
+            height: 100%;
         }
     </style>
 </head>
-<body>
+<body class="text-slate-100 flex justify-center items-center h-screen w-screen p-2">
 
-    <div class="tiktok-container">
-        <div class="header">
-            <h1>Strukturarte</h1>
-            <p>Diseño de Vigas de Concreto</p>
+    <div class="w-full max-w-[410px] h-full max-h-[820px] bg-slate-950 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-2xl relative">
+        
+        <div class="text-center border-b border-slate-800 pb-2">
+            <h1 class="text-xl font-black text-cyan-400 tracking-widest uppercase">Strukturarte</h1>
+            <p class="text-[11px] text-slate-400 font-medium">Análisis de Secciones Flexionadas</p>
         </div>
 
-        <div id="alert-panel">Sección Dúctil Segura</div>
-
-        <div class="visual-box section-box">
-            <div class="box-title">Sección Transversal</div>
-            <svg id="beam-svg"></svg>
-        </div>
-
-        <div class="visual-box chart-box">
-            <div class="box-title">Momento Resistente</div>
-            <canvas id="canvas-grafico"></canvas>
-        </div>
-
-        <div class="controls-card">
-            <div class="control-group">
-                <div class="control-label">Base (b) <span class="value" id="val-b">30 cm</span></div>
-                <input type="range" id="slide-b" min="15" max="60" value="30">
+        <div class="space-y-2">
+            <div id="status-panel" class="py-1.5 text-center font-bold text-sm rounded-lg bg-slate-900 border border-slate-800 text-slate-400 uppercase tracking-wider">
+                Carga en reposo
             </div>
 
-            <div class="control-group">
-                <div class="control-label">Peralte (h) <span class="value" id="val-h">50 cm</span></div>
-                <input type="range" id="slide-h" min="30" max="80" value="50">
-            </div>
-
-            <div class="control-group">
-                <div class="control-label">Varillas (As) <span class="value" id="val-varillas">3 varillas</span></div>
-                <input type="range" id="slide-varillas" min="2" max="10" value="3">
+            <div class="grid grid-cols-3 gap-1.5 text-center">
+                <div class="bg-slate-900/60 p-1.5 rounded-lg border border-slate-900">
+                    <h4 class="text-[9px] uppercase tracking-wider text-slate-400">Carga w</h4>
+                    <p id="txt-w" class="text-sm font-bold text-amber-400">0.0 kg/m</p>
+                </div>
+                <div class="bg-slate-900/60 p-1.5 rounded-lg border border-slate-900">
+                    <h4 class="text-[9px] uppercase tracking-wider text-slate-400">Mu Actuante</h4>
+                    <p id="txt-mu" class="text-sm font-bold text-cyan-400">0 kg-m</p>
+                </div>
+                <div class="bg-slate-900/60 p-1.5 rounded-lg border border-slate-900">
+                    <h4 class="text-[9px] uppercase tracking-wider text-slate-400">ΦMn Mínimo</h4>
+                    <p id="txt-phimn" class="text-sm font-bold text-emerald-400">0 kg-m</p>
+                </div>
             </div>
         </div>
 
-        <button class="btn-action" onclick="calcularYAnimar()">Aplicar Carga</button>
+        <div id="main-canvas-container" class="w-full h-[150px] bg-slate-900/40 border border-slate-900 rounded-xl relative">
+            <span class="absolute top-1 left-2 text-[9px] uppercase text-slate-500 tracking-wider">Comportamiento Elástico</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+            <div class="bg-slate-900/40 border border-slate-900 rounded-xl p-1 relative flex flex-col justify-end items-center h-[160px]">
+                <span class="absolute top-1 left-2 text-[9px] uppercase text-slate-500 tracking-wider">Perfil de Deformación (ε)</span>
+                <div id="strain-canvas-container" class="w-full h-[130px]"></div>
+            </div>
+            <div class="bg-slate-900/40 border border-slate-900 rounded-xl p-1 relative flex flex-col justify-end items-center h-[160px]">
+                <span class="absolute top-1 left-2 text-[9px] uppercase text-slate-500 tracking-wider">Sección Transversal</span>
+                <div id="section-canvas-container" class="w-full h-[130px]"></div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between text-xs text-slate-400 border-b border-slate-800 pb-1">
+                <span>Falla: <strong id="txt-falla" class="text-white">--</strong></span>
+                <span>As: <strong id="txt-as" class="text-cyan-400">0.0</strong> cm²</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                <div>
+                    <label class="block text-slate-400">Longitud (L): <span id="val-L" class="text-cyan-400 font-bold"></span>m</label>
+                    <input type="range" id="slide-L" min="3" max="8" value="5" step="0.5" class="w-full h-1 bg-slate-700 rounded-lg appearance-none">
+                </div>
+                <div>
+                    <label class="block text-slate-400">Peralte (h): <span id="val-h" class="text-cyan-400 font-bold"></span>cm</label>
+                    <input type="range" id="slide-h" min="30" max="70" value="50" step="5" class="w-full h-1 bg-slate-700 rounded-lg appearance-none">
+                </div>
+                <div>
+                    <label class="block text-slate-400">Base (b): <span id="val-b" class="text-cyan-400 font-bold"></span>cm</label>
+                    <input type="range" id="slide-b" min="15" max="40" value="25" step = "5" class="w-full h-1 bg-slate-700 rounded-lg appearance-none">
+                </div>
+                <div>
+                    <label class="block text-slate-400">f'c Concreto: <span id="val-fc" class="text-cyan-400 font-bold"></span>kg/c²</label>
+                    <input type="range" id="slide-fc" min="200" max="400" value="250" step="50" class="w-full h-1 bg-slate-700 rounded-lg appearance-none">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs pt-1">
+                <div class="flex items-center space-x-1">
+                    <span class="text-slate-400">Cantidad:</span>
+                    <input type="number" id="numVarillas" value="3" min="2" max="8" class="w-8 p-0.5 bg-slate-800 border border-slate-700 rounded text-center font-bold text-white">
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="text-slate-400">Calibre:</span>
+                    <select id="sizeVarillas" class="p-0.5 bg-slate-800 border border-slate-700 rounded text-white text-[11px]">
+                        <option value="1.29">#4 (1/2")</option>
+                        <option value="1.99">#5 (5/8")</option>
+                        <option value="2.84" selected>#6 (3/4")</option>
+                        <option value="5.07">#8 (1")</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+            <button id="btn-start" class="col-span-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-extrabold py-2 px-4 rounded-xl text-xs uppercase tracking-wider shadow-lg transition-transform active:scale-95">Iniciar Simulación</button>
+            <button id="btn-reset" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 px-4 rounded-xl text-xs uppercase transition-colors">Reset</button>
+        </div>
     </div>
 
     <script>
-        let grafico;
+        const Es = 2000000; // Módulo de elasticidad del acero (kg/cm²)
+        const fy = 4200;    // Fluencia del acero (kg/cm²)
+        const recubrimiento = 4; // cm
 
-        function inicializarGrafico() {
-            const ctx = document.getElementById('canvas-grafico').getContext('2d');
-            grafico = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                    datasets: [{
-                        label: 'Momento',
-                        data: Array(11).fill(0),
-                        borderColor: '#00ffff',
-                        borderWidth: 3,
-                        backgroundColor: 'rgba(0, 255, 255, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { display: false },
-                        y: { 
-                            grid: { color: '#1e293b' }, 
-                            ticks: { color: '#64748b', font: { size: 10 } },
-                            beginAtZero: true
-                        }
+        // Estado global de la simulación
+        let viga = { L: 5, h: 50, b: 25, fc: 250, numV: 3, areaV: 2.84, As: 8.52, c: 15, phiMn: 0, w_fail: 0 };
+        let sim = { running: false, failed: false, progress: 0, current_w: 0, current_mu: 0 };
+
+        // --- INSTANCIA 1: VISUALIZACIÓN DE LA VIGA ---
+        const sketchViga = (p) => {
+            p.setup = () => {
+                let container = p.select('#main-canvas-container');
+                p.createCanvas(container.width, 150).parent(container);
+            };
+
+            p.draw = () => {
+                p.background(11, 15, 25, 0); // Transparente para usar el fondo del div
+                p.stroke(50, 65, 85);
+                p.strokeWeight(1);
+                
+                let x0 = 40;
+                let x1 = p.width - 40;
+                let w_line = x1 - x0;
+                let y0 = 75;
+
+                // Dibujar apoyos
+                p.fill(100); p.noStroke();
+                p.triangle(x0, y0, x0-8, y0+12, x0+8, y0+12);
+                p.triangle(x1, y0, x1-8, y0+12, x1+8, y0+12);
+
+                // Evolución de carga distribuida (flechas crecientes)
+                if (sim.current_w > 0) {
+                    p.stroke(245, 158, 11, 180);
+                    p.fill(245, 158, 11);
+                    let maxArrowH = 25;
+                    let currentArrowH = maxArrowH * sim.progress;
+                    for (let x = x0; x <= x1; x += 15) {
+                        let arrowY = y0 - 10 - currentArrowH;
+                        p.strokeWeight(1.5);
+                        p.line(x, arrowY, x, y0 - 6);
+                        p.strokeWeight(1);
+                        p.triangle(x, y0 - 6, x - 3, y0 - 10, x + 3, y0 - 10);
                     }
                 }
-            });
-        }
 
-        function dibujarSeccion(b, h, numVarillas) {
-            const svg = document.getElementById('beam-svg');
-            svg.innerHTML = ''; 
+                // Eje sin deformar (referencia tenue)
+                p.stroke(50); p.strokeWeight(1); p.drawingContext.setLineDash([4, 4]);
+                p.line(x0, y0, x1, y0); p.drawingContext.setLineDash([]);
 
-            // Dimensiones lógicas fijas para el SVG para evitar colapsos
-            const svgW = 350; 
-            const svgH = 120;
-            svg.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
-
-            // Escala calculada con un padding protector
-            const pad = 20;
-            const escala = Math.min((svgW - pad) / b, (svgH - pad) / h);
-            const wDibujo = b * escala;
-            const hDibujo = h * escala;
-
-            const x0 = (svgW - wDibujo) / 2;
-            const y0 = (svgH - hDibujo) / 2;
-
-            // Bloque Concreto
-            const concreto = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            concreto.setAttribute("x", x0);
-            concreto.setAttribute("y", y0);
-            concreto.setAttribute("width", wDibujo);
-            concreto.setAttribute("height", hDibujo);
-            concreto.setAttribute("fill", "#1e293b");
-            concreto.setAttribute("stroke", "#475569");
-            concreto.setAttribute("stroke-width", "2");
-            svg.appendChild(concreto);
-
-            // Varillas
-            const recubrimientoVisual = 10;
-            const yVarillas = y0 + hDibujo - recubrimientoVisual;
-            const xInicio = x0 + recubrimientoVisual;
-            const xFin = x0 + wDibujo - recubrimientoVisual;
-            const paso = numVarillas > 1 ? (xFin - xInicio) / (numVarillas - 1) : 0;
-            
-            // Radio de varilla proporcional pero con límite para que no se encimen
-            const radioVarilla = Math.min(wDibujo / (numVarillas * 3), 6); 
-
-            for (let i = 0; i < numVarillas; i++) {
-                const cx = numVarillas > 1 ? xInicio + (paso * i) : (xInicio + xFin) / 2;
-                const varilla = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                varilla.setAttribute("cx", cx);
-                varilla.setAttribute("cy", yVarillas - radioVarilla);
-                varilla.setAttribute("r", radioVarilla);
-                varilla.setAttribute("fill", "#00ffff");
-                svg.appendChild(varilla);
-            }
-        }
-
-        function calcularYAnimar() {
-            const b = parseFloat(document.getElementById('slide-b').value);
-            const h = parseFloat(document.getElementById('slide-h').value);
-            const n = parseInt(document.getElementById('slide-varillas').value);
-
-            const As = n * 2.84; // Usando varilla #6 aprox
-            const d = h - 5; 
-            const fy = 4200;  
-            const fc = 250;  
-
-            const rho = As / (b * d);
-            const rhoMax = (0.85 * 0.85 * fc / fy) * (6000 / (6000 + fy));
-
-            const alertPanel = document.getElementById('alert-panel');
-            
-            if (rho > rhoMax) {
-                alertPanel.innerText = "¡FALLA FRÁGIL! (SOBRE-REFORZADA)";
-                alertPanel.className = "danger";
-                grafico.data.datasets[0].borderColor = '#ef4444';
-                grafico.data.datasets[0].backgroundColor = 'rgba(239, 68, 68, 0.1)';
-            } else {
-                alertPanel.innerText = "FALLA DÚCTIL (DISEÑO SEGURO)";
-                alertPanel.className = "";
-                grafico.data.datasets[0].borderColor = '#00ffff';
-                grafico.data.datasets[0].backgroundColor = 'rgba(0, 255, 255, 0.1)';
-            }
-
-            const a = (As * fy) / (0.85 * fc * b);
-            const Mn = (As * fy * (d - a / 2)) / 100000; // a kN-m aprox
-            
-            let datosPasos = [];
-            for (let i = 0; i <= 10; i++) {
-                // Si es frágil, la curva cae abruptamente al final
-                if (rho > rhoMax && i > 8) {
-                    datosPasos.push(Mn * 0.5); 
-                } else {
-                    let factor = Math.sin((i / 10) * (Math.PI / 2));
-                    datosPasos.push(Mn * factor);
+                // Curva de deflexión elástica/plástica acumulada
+                p.noFill();
+                p.stroke(sim.failed ? '#f43f5e' : '#22d3ee');
+                p.strokeWeight(5);
+                p.beginShape();
+                p.vertex(x0, y0);
+                let maxDef = 20 * sim.progress; // Deflexión visual máxima
+                for (let x = 0; x <= w_line; x += 5) {
+                    let x_norm = x / w_line;
+                    // Ecuación aproximada de la elástica bajo carga uniforme: x*(l^3 - 2lx^2 + x^3)
+                    let y_flex = 16 * maxDef * (x_norm - 2 * Math.pow(x_norm, 3) + Math.pow(x_norm, 4)) / 5;
+                    p.vertex(x0 + x, y0 + y_flex);
                 }
-            }
+                p.vertex(x1, y0);
+                p.endShape();
+            };
+        };
 
-            grafico.data.datasets[0].data = Array(11).fill(0);
-            grafico.update();
+        // --- INSTANCIA 2: DIAGRAMA DE DEFORMACIÓN (ε) ---
+        const sketchStrain = (p) => {
+            p.setup = () => {
+                let container = p.select('#strain-canvas-container');
+                p.createCanvas(container.width, 130).parent(container);
+            };
 
-            let pasoActual = 0;
-            const intervalo = setInterval(() => {
-                if (pasoActual <= 10) {
-                    grafico.data.datasets[0].data[pasoActual] = datosPasos[pasoActual];
-                    grafico.update('none'); 
-                    pasoActual++;
-                } else {
-                    clearInterval(intervalo);
-                }
-            }, 50);
-        }
+            p.draw = () => {
+                p.background(15, 23, 42, 0);
+                let cx = p.width / 2;
+                let topY = 15;
+                let botY = p.height - 15;
+                let h_total = botY - topY;
 
-        function vincularControles() {
-            const inputs = ['b', 'h', 'varillas'];
-            inputs.forEach(id => {
-                const slider = document.getElementById(`slide-${id}`);
-                const etiqueta = document.getElementById(`val-${id}`);
+                // Eje neutro posicional calculado
+                let ratio_c = viga.c / viga.h;
+                let y_na = topY + h_total * ratio_c;
+
+                // Línea neutra central
+                p.stroke(71, 85, 105, 120); p.strokeWeight(1);
+                p.line(cx, topY, cx, botY);
+                p.stroke(59, 130, 246, 120); p.drawingContext.setLineDash([3, 3]);
+                p.line(10, y_na, p.width - 10, y_na); p.drawingContext.setLineDash([]);
+
+                // Deformaciones límites basadas en el progreso de carga
+                let max_ec = 0.003 * sim.progress;
+                let d_cm = viga.h - recubrimiento;
+                let max_es = (0.003 * (d_cm - viga.c) / viga.c) * sim.progress;
+
+                let scaleX = 4000; // Escala para amplificar el valor infinitesimal de epsilon
+
+                // Triángulos de deformación (Concreto comprimido arriba, Acero tensionado abajo)
+                p.stroke('#f43f5e'); p.strokeWeight(1.5);
+                p.fill(244, 63, 94, 30);
+                p.triangle(cx, y_na, cx + max_ec * scaleX, topY, cx, topY);
+
+                p.stroke('#34d399');
+                p.fill(52, 211, 153, 30);
+                let d_visualY = topY + h_total * (d_cm / viga.h);
+                p.triangle(cx, y_na, cx - max_es * scaleX, d_visualY, cx, d_visualY);
+
+                // Textos técnicos dinámicos
+                p.noStroke(); p.fill(226, 232, 240); p.textSize(9);
+                p.textAlign(p.LEFT, p.CENTER);
+                p.text(`εc: ${max_ec.toFixed(5)}`, cx + 8, topY + 5);
+                p.textAlign(p.RIGHT, p.CENTER);
+                p.text(`εs: ${max_es.toFixed(5)}`, cx - 8, d_visualY - 5);
+            };
+        };
+
+        // --- INSTANCIA 3: SECCIÓN TRANSVERSAL ---
+        const sketchSection = (p) => {
+            p.setup = () => {
+                let container = p.select('#section-canvas-container');
+                p.createCanvas(container.width, 130).parent(container);
+            };
+
+            p.draw = () => {
+                p.background(15, 23, 42, 0);
                 
+                // Dimensionamiento proporcional de la sección
+                let maxH = 90;
+                let scale = maxH / viga.h;
+                let w_box = viga.b * scale;
+                let h_box = viga.h * scale;
+
+                let x0 = (p.width - w_box) / 2;
+                let y0 = (p.height - h_box) / 2;
+
+                // Bloque concreto
+                p.stroke(71, 85, 105); p.strokeWeight(2);
+                p.fill(30, 41, 59);
+                p.rect(x0, y0, w_box, h_box, 3);
+
+                // Mostrar línea del eje neutro calculada sobre la viga física
+                let y_na = y0 + viga.c * scale;
+                p.stroke('#3b82f6'); p.strokeWeight(1); p.drawingContext.setLineDash([2, 2]);
+                p.line(x0 - 5, y_na, x0 + w_box + 5, y_na); p.drawingContext.setLineDash([]);
+
+                // Acero de refuerzo inferior (Varillas redondas neón)
+                let d_visualY = y0 + (viga.h - recubrimiento) * scale;
+                let paddingX = 12;
+                let startX = x0 + paddingX;
+                let endX = x0 + w_box - paddingX;
+                let stepX = viga.numV > 1 ? (endX - startX) / (viga.numV - 1) : 0;
+
+                p.noStroke(); p.fill('#00ffff');
+                for (let i = 0; i < viga.numV; i++) {
+                    let cx = viga.numV > 1 ? startX + (stepX * i) : (startX + endX) / 2;
+                    p.ellipse(cx, d_visualY, 6, 6);
+                }
+            };
+        };
+
+        // --- MOTOR MATEMÁTICO ACORDES CON REGLAMENTOS ACI ---
+        function procesarSeccion() {
+            let d = viga.h - recubrimiento;
+            let beta1 = Math.max(0.65, 0.85 - 0.05 * Math.max(0, viga.fc - 280) / 70);
+            
+            // Iteración numérica iterativa para determinar el eje neutro (c) exacto en equilibrio T = C
+            let c_low = 0.1, c_high = viga.h, c = d / 2;
+            for (let i = 0; i < 50; i++) {
+                c = (c_low + c_high) / 2;
+                let epsilon_s = 0.003 * (d - c) / c;
+                let fs = Math.min(fy, Es * epsilon_s);
+                let T = viga.As * fs;
+                let C = 0.85 * viga.fc * (beta1 * c) * viga.b;
+                
+                if (Math.abs(T - C) < 0.1) break;
+                if (C > T) c_high = c; else c_low = c;
+            }
+            viga.c = c;
+
+            // Determinar factor de reducción de resistencia phi (Φ)
+            let epsilon_s_ult = 0.003 * (d - c) / c;
+            let phi = 0.65;
+            let txtFalla = "Frágil (Compresión)";
+            let colorClass = "text-rose-500 font-bold";
+
+            if (epsilon_s_ult >= 0.005) {
+                phi = 0.90;
+                txtFalla = "Dúctil (Tensión)";
+                colorClass = "text-emerald-400 font-bold";
+            } else if (epsilon_s_ult > (fy / Es)) {
+                phi = 0.65 + 0.25 * (epsilon_s_ult - (fy / Es)) / (0.005 - (fy / Es));
+                txtFalla = "Transición";
+                colorClass = "text-amber-400 font-bold";
+            }
+
+            // Momento nominal resistente de diseño ΦMn
+            let a = beta1 * c;
+            let Mn = viga.As * Math.min(fy, Es * epsilon_s_ult) * (d - a / 2);
+            viga.phiMn = (phi * Mn) / 100; // Pasar a kg-m
+
+            // Carga última equivalente asociada (w = 8 * M / L^2)
+            viga.w_fail = (8 * viga.phiMn) / (viga.L * viga.L);
+
+            // Actualizar interfaz
+            document.getElementById('txt-phimn').innerText = `${Math.round(viga.phiMn).toLocaleString('es-MX')} kg-m`;
+            document.getElementById('txt-as').innerText = viga.As.toFixed(2);
+            let fallaEl = document.getElementById('txt-falla');
+            fallaEl.innerText = txtFalla;
+            fallaEl.className = colorClass;
+        }
+
+        // --- SISTEMA DE ANIMACIÓN Y CONTROLADORES ---
+        function sincronizarSliders() {
+            const variables = [
+                { id: 'L', key: 'L', sufijo: ' m' },
+                { id: 'h', key: 'h', sufijo: ' cm' },
+                { id: 'b', key: 'b', sufijo: ' cm' },
+                { id: 'fc', key: 'fc', sufijo: ' kg/cm²' }
+            ];
+
+            variables.forEach(v => {
+                let slider = document.getElementById(`slide-${v.id}`);
+                let output = document.getElementById(`val-${v.id}`);
+                output.innerText = slider.value + v.sufijo;
+
                 slider.addEventListener('input', () => {
-                    const sufijo = id === 'varillas' ? ' varillas' : ' cm';
-                    etiqueta.innerText = slider.value + sufijo;
-                    dibujarSeccion(
-                        document.getElementById('slide-b').value,
-                        document.getElementById('slide-h').value,
-                        document.getElementById('slide-varillas').value
-                    );
+                    output.innerText = slider.value + v.sufijo;
+                    viga[v.key] = parseFloat(slider.value);
+                    recalcularTodo();
                 });
             });
+
+            // Capturar cambios en inputs de acero
+            let numIn = document.getElementById('numVarillas');
+            let sizeIn = document.getElementById('sizeVarillas');
+            
+            const actualizarAcero = () => {
+                viga.numV = parseInt(numIn.value);
+                viga.areaV = parseFloat(sizeIn.value);
+                viga.As = viga.numV * viga.areaV;
+                recalcularTodo();
+            };
+            numIn.addEventListener('input', actualizarAcero);
+            sizeIn.addEventListener('change', actualizarAcero);
         }
 
+        function recalcularTodo() {
+            sim.running = false;
+            sim.failed = false;
+            sim.progress = 0;
+            sim.current_w = 0;
+            sim.current_mu = 0;
+            document.getElementById('status-panel').innerText = "Carga en reposo";
+            document.getElementById('status-panel').className = "py-1.5 text-center font-bold text-sm rounded-lg bg-slate-900 border border-slate-800 text-slate-400 uppercase tracking-wider";
+            procesarSeccion();
+            actualizarDashboard();
+        }
+
+        function actualizarDashboard() {
+            document.getElementById('txt-w').innerText = `${sim.current_w.toFixed(1)} kg/m`;
+            document.getElementById('txt-mu').innerText = `${Math.round(sim.current_mu).toLocaleString('es-MX')} kg-m`;
+        }
+
+        // Bucle de animación global controlado por JavaScript
+        let loopSimulacion = null;
+        function comenzarCarga() {
+            if (sim.failed) recalcularTodo();
+            sim.running = true;
+            document.getElementById('status-panel').innerText = "Incrementando fuerza w...";
+            document.getElementById('status-panel').className = "py-1.5 text-center font-bold text-sm rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-400 uppercase tracking-wider";
+
+            if (loopSimulacion) clearInterval(loopSimulacion);
+            
+            loopSimulacion = setInterval(() => {
+                if (sim.progress < 1.0) {
+                    sim.progress += 0.015; // Velocidad de crecimiento de la carga
+                    if (sim.progress > 1.0) sim.progress = 1.0;
+                    
+                    sim.current_w = viga.w_fail * sim.progress;
+                    sim.current_mu = (sim.current_w * viga.L * viga.L) / 8;
+                    actualizarDashboard();
+                } else {
+                    clearInterval(loopSimulacion);
+                    sim.failed = true;
+                    sim.running = false;
+                    document.getElementById('status-panel').innerText = "¡Falla de la Sección Rectangular!";
+                    document.getElementById('status-panel').className = "py-1.5 text-center font-bold text-sm rounded-lg bg-rose-500/20 border border-rose-500/50 text-rose-400 uppercase tracking-wider";
+                }
+            }, 30);
+        }
+
+        // Inicializar los Canvas de p5.js de forma independiente
+        new p5(sketchViga);
+        new p5(sketchStrain);
+        new p5(sketchSection);
+
         window.onload = () => {
-            inicializarGrafico();
-            vincularControles();
-            dibujarSeccion(30, 50, 3);
+            sincronizarSliders();
+            recalcularTodo();
+            
+            document.getElementById('btn-start').addEventListener('click', comenzarCarga);
+            document.getElementById('btn-reset').addEventListener('click', recalcularTodo);
         };
     </script>
 </body>
